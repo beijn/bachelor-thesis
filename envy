@@ -1,0 +1,83 @@
+#!python
+
+
+CONDA = "micromamba"
+SPEC  = "environment.yml"
+
+
+from typing import *
+from types import SimpleNamespace as obj
+
+import subprocess
+
+from ruamel.yaml import YAML
+
+
+
+def branch(args, yaml):
+  ops = {
+    "add": install,
+    "+"  : install,
+    "del": remove,
+    "-"  : remove,
+  }
+
+
+  init = f'eval "$({CONDA} shell hook --shell "$(basename "$SHELL")")"'
+  acti = f"{CONDA} activate {yaml['name']}"
+
+  match args:
+    # TODO add case for envornment creation
+    # create = f"{CONDA} create -n {yaml['name']} -y -f {SPEC}"
+
+    case []:
+      return f"{init} && {acti}", yaml
+
+    case [op, *pkgs] if op in ops:
+      op = ops[op]
+      cmd, yaml = op(yaml, pkgs)
+      cmd = f"{init} && {acti} && {cmd} && {acti}"
+      return cmd, yaml
+
+    case _:
+      print(f"Usage Error!\nThe first argument must be the operation to perform on the packages which are the rest of the arguments.\nIt must be one of {[*ops.keys()]}, but was '{op}'.")
+      return "", yaml
+
+
+
+
+def general(depmod, cmdgen):
+  def inner(yaml, pkgs):
+    for p in pkgs: depmod(yaml['dependencies'], p)
+    return cmdgen(yaml, pkgs), yaml
+  return inner
+
+
+install = general(
+  depmod = lambda ds, p: ds if p in ds else ds.append(p),
+  cmdgen = lambda y, ps: f"{CONDA} install -y {' '.join(ps)}"   # NOTE conda *env* update
+)
+
+remove = general(
+  depmod = lambda ds, p: ds if p not in ds else ds.remove(p),
+  cmdgen = lambda y, ps: f"{CONDA} remove  -y {' '.join(ps)}"
+)
+
+
+
+def main():
+  import sys
+
+  yaml = YAML()
+
+  with open(SPEC, "r") as F:
+    yml = yaml.load(F)
+  cmd, yml = branch(sys.argv[1:], yml)
+  with open(SPEC, "w") as F:
+    yaml.dump(yml, F)
+
+  subprocess.run(cmd, shell=True)
+
+
+if __name__ == "__main__":
+  main()
