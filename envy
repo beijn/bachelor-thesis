@@ -22,22 +22,15 @@ def branch(args, yaml):
     "-"  : remove,
   }
 
-
-  init = f'eval "$({CONDA} shell hook --shell "$(basename "$SHELL")")"'
-  acti = f"{CONDA} activate {yaml['name']}"
-
   match args:
     # TODO add case for envornment creation
     # create = f"{CONDA} create -n {yaml['name']} -y -f {SPEC}"
 
     case []:
-      return f"{init} && {acti}", yaml
+      return f"", yaml
 
     case [op, *pkgs] if op in ops:
-      op = ops[op]
-      cmd, yaml = op(yaml, pkgs)
-      cmd = f"{init} && {acti} && {cmd} && {acti}"
-      return cmd, yaml
+      return ops[op](yaml, pkgs)
 
     case _:
       print(f"Usage Error!\nThe first argument must be the operation to perform on the packages which are the rest of the arguments.\nIt must be one of {[*ops.keys()]}, but was '{op}'.")
