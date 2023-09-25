@@ -1,5 +1,7 @@
 #!python
 
+# NOTE: you can also export a similar spec with `conda env export --from-history`
+
 
 CONDA = "micromamba"
 SPEC  = "environment.yml"
@@ -29,8 +31,10 @@ def branch(args, yaml):
     case []:
       return f"", yaml
 
+    case ['pip', rest]: return branch(args, yaml, pip=True)
+
     case [op, *pkgs] if op in ops:
-      return ops[op](yaml, pkgs)
+      return ops[op](yaml, pkgs, pip)
 
     case _:
       print(f"Usage Error!\nThe first argument must be the operation to perform on the packages which are the rest of the arguments.\nIt must be one of {[*ops.keys()]}, but was '{op}'.")

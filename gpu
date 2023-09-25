@@ -1,11 +1,11 @@
-#!bash
+#!/usr/bin/bash
 
-SLURM_ARGS="-p gpu --gres gpu:tesla:1 --time 1200"
+SLURM_ARGS="-p gpu --gres gpu:tesla:1 --cpus-per-task=10 --mem=40G"
 
 if [ $# = 0 ]; then
-  srun $SLURM_ARGS --pty bash
+  srun $SLURM_ARGS --time 120  --pty bash
   exit $?
 fi
 
 
-sbatch $SLURM_ARGS
+sbatch $SLURM_ARGS --time 1200
