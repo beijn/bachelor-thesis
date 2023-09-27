@@ -2,7 +2,7 @@ import os
 from os.path import join
 from datetime import datetime
 import inspect
-import json 
+import json
 import yaml
 from pathlib import Path
 
@@ -26,20 +26,20 @@ class Project:
 # TODO: add Visuals cfg
 # visualize_gt
 
-            
+
 class Train:
     epochs: int     = 1001
     n_folds: int    = 5
     size: int       = [512, 512]
     batch_size: int = 2
     augment: bool   = True
-    
+
 
 class Valid:
     size: int       = [512, 512]
     batch_size: int = 1
-        
-        
+
+
 class Model:
     arch: str         = 'sparse_seunet'
 
@@ -59,11 +59,11 @@ class Model:
     # model structure.
     coord_conv: bool  = True
     multi_level: bool = True
-    
+
     # weights.
     load_pretrained: bool = False
     weights: str          = ""
-    
+
     save_checkpoint: bool  = False
     save_model_files: bool = True
 
@@ -76,7 +76,7 @@ class Model:
     # NOTE: for semantic segmentation add your loss cfg here
     criterion=dict(
         type='SparseCriterion',
-        losses=["labels", "masks"], 
+        losses=["labels", "masks"],
         weights=dict(
             labels=2.0,
             focal_masks=5.0,
@@ -104,16 +104,16 @@ class Model:
 class Run:
     runs_dir: str           = 'runs'
     experiment_name: str    = f'[{Model.arch}]-[512]'
-    run_name: str           = f'[<dataset_name>]/[softmax_iam]/[multi_level={Model.multi_level}]-[coord_conv={Model.coord_conv}]-[losses={Model.criterion.losses}]/[job={JOB_ID}]-[{TIME}]'
+    run_name: str           = f'[rectangle]/[softmax_iam]/[multi_level={Model.multi_level}]-[coord_conv={Model.coord_conv}]-[losses={Model.criterion.losses}]/[job={JOB_ID}]-[{TIME}]'
     exist_ok: bool          = False
     comment: str            = """
-                                - wd = 1e-4 
+                                - wd = 1e-4
                                 - no overlap supression in the dataset
                                 - overlaps
-                                - added BatchNorm2d to stacked 3x3 convolutions 
-                                - fixed sigmoid iam 
+                                - added BatchNorm2d to stacked 3x3 convolutions
+                                - fixed sigmoid iam
                               """
-        
+
 
 class cfg(BaseConfig):
     model: Model           = Model
@@ -122,8 +122,8 @@ class cfg(BaseConfig):
     project: Project       = Project
     image: Image           = Image
     run: Run               = Run
-    dataset: str           = "<dataset_name>"
-    
+    dataset: str           = "rectangle"
+
     optimizer=dict(
         type="AdamW",
         lr=1e-4,
@@ -145,7 +145,7 @@ class cfg(BaseConfig):
     seed: int = 3407
     device: str = "cuda"
     verbose: bool = True
-    
+
 
 cfg = cfg()
 # print(cfg)

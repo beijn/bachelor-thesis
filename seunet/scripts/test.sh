@@ -6,6 +6,8 @@
 #SBATCH --job-name=eval_sparseunet
 #SBATCH --output=./outputs/eval/eval_job_%j.out
 
+eval "$(micromamba shell hook --shell $(basename "$SHELL"))" && micromamba activate yaroslav
+
 nvidia-smi
 
 # python test_net_v2.py

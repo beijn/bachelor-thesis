@@ -50,7 +50,7 @@ from utils.registry import DATASETS
 def run(cfg: cfg):
     # create directories.
     cfg.save_dir = increment_path(
-        join(cfg.run.runs_dir, "evals", cfg.run.experiment_name, cfg.run.run_name), 
+        join(cfg.run.runs_dir, "evals", cfg.run.experiment_name, cfg.run.run_name),
         exist_ok=cfg.run.exist_ok
         )
     print(cfg.save_dir)
@@ -60,7 +60,7 @@ def run(cfg: cfg):
 
     # set seed for reproducibility
     set_seed(cfg.seed)
-    
+
 
     # Run training
     for fold_i in [0]:
@@ -72,14 +72,14 @@ def run(cfg: cfg):
         # train_loader, valid_loader = get_dataloaders(cfg, df, fold=fold_i)
 
         dataset = DATASETS.get(cfg.dataset.name)
-        train_dataset = dataset(cfg, 
-                                is_train=True, 
-                                normalization=normalize, 
+        train_dataset = dataset(cfg,
+                                is_train=True,
+                                normalization=normalize,
                                 transform=train_transforms(cfg)
                                 )
-        valid_dataset = dataset(cfg, 
+        valid_dataset = dataset(cfg,
                                 is_train=False,
-                                normalization=normalize, 
+                                normalization=normalize,
                                 transform=valid_transforms(cfg)
                                 )
         train_dataloader = build_loader(train_dataset, batch_size=cfg.train.batch_size, num_workers=2)
@@ -105,9 +105,9 @@ def run(cfg: cfg):
                 images.append(target["image"])
 
                 targets.append(target)
-                
+
             images = nested_tensor_from_tensor_list(images)   # (B, C, H, W)
-            
+
             output = model(images.tensors, idx)
 
         #     if idx == 14:
@@ -125,52 +125,52 @@ def run(cfg: cfg):
             # vis_preds_occl = output[f'pred_occluders'].sigmoid().cpu().detach().numpy()
 
             # visualize_grid_v2(
-            #     masks=vis_preds_occl[0, ...], 
+            #     masks=vis_preds_occl[0, ...],
             #     titles=vis_logits_cyto[0, :, 0],
-            #     ncols=5, 
+            #     ncols=5,
             #     path=f'{cfg.visuals_dir}/occluders_{idx}.jpg'
             # )
 
         #     B, N, H, W = iam.shape
-            
+
             visualize_grid_v2(
-                masks=vis_preds_cyto[0, ...], 
+                masks=vis_preds_cyto[0, ...],
                 titles=vis_logits_cyto[0, :, 0],
-                ncols=5, 
+                ncols=5,
                 path=f'{cfg.visuals_dir}/cyto_{idx}.jpg'
             )
 
             visualize_grid_v2(
-                masks=vis_preds_cyto[0, ...], 
+                masks=vis_preds_cyto[0, ...],
                 titles=vis_logits_cyto[0, :, 0],
-                ncols=10, 
+                ncols=10,
                 path=f'{cfg.visuals_dir}/big_cyto_{idx}.jpg'
             )
             break
-        
+
             # visualize_grid_v2(
-            #     masks=vis_preds_iams[0, ...], 
+            #     masks=vis_preds_iams[0, ...],
             #     titles=vis_logits_cyto[0, :, 0],
-            #     ncols=5, 
-            #     path=f'{cfg.visuals_dir}/iam_[iam_init={idx}].jpg', 
+            #     ncols=5,
+            #     path=f'{cfg.visuals_dir}/iam_[iam_init={idx}].jpg',
             #     cmap='jet',
             #     # vmin=0, vmax=1
             # )
 
             # TODO: Class for plotting
             # -----------
-            # IAM Logits.  
+            # IAM Logits.
             # vis_preds_iams = iam.cpu().detach().numpy()
-            
+
             # visualize_grid_v2(
-            #     masks=vis_preds_iams[0, ...], 
+            #     masks=vis_preds_iams[0, ...],
             #     titles=vis_logits_cyto[0, :, 0],
-            #     ncols=5, 
+            #     ncols=5,
             #     path=f'{cfg.visuals_dir}/iam_logits_{idx}.jpg',
             #     cmap='jet',
             #     # vmin=0, vmax=1
             # )
-            
+
 
             # -----------
             # IAM Sigmoid.
@@ -181,19 +181,19 @@ def run(cfg: cfg):
             #     cmap='jet',
             #     path=f'{cfg.visuals_dir}/iam_sigmoid_{idx}.jpg'
             # )
-            
+
             # visualize_grid_v2(
-            #     masks=vis_preds_iams[0, ...], 
+            #     masks=vis_preds_iams[0, ...],
             #     titles=vis_logits_cyto[0, :, 0],
-            #     ncols=5, 
+            #     ncols=5,
             #     path=f'{cfg.visuals_dir}/iam_sigmoid_{idx}.jpg',
             #     cmap='jet',
             #     # vmin=0, vmax=1
             # )
 
-            
+
             # -----------
-            # IAM Softmax.  
+            # IAM Softmax.
             # iam = F.softmax(iam.view(B, N, -1), dim=-1)
             # iam = iam.view(B, N, H, W)
             # # vis_preds_iams = iam.cpu().detach().numpy()
@@ -204,11 +204,11 @@ def run(cfg: cfg):
             #     cmap='jet',
             #     path=f'{cfg.visuals_dir}/iam_softmax_{idx}.jpg'
             # )
-            
+
             # visualize_grid_v2(
-            #     masks=vis_preds_iams[0, ...], 
+            #     masks=vis_preds_iams[0, ...],
             #     titles=vis_logits_cyto[0, :, 0],
-            #     ncols=5, 
+            #     ncols=5,
             #     path=f'{cfg.visuals_dir}/iam_softmax_{idx}.jpg',
             #     cmap='jet',
             #     # vmin=0, vmax=1
@@ -216,7 +216,7 @@ def run(cfg: cfg):
 
             # torch.cuda.empty_cache()
             # gc.collect()
-            
+
         # raise
 
         # evaluate.
@@ -257,36 +257,36 @@ def parse_args():
 if __name__ == '__main__':
     args = parse_args()
 
-    # experiment_path = Path("/gpfs/space/home/prytula/scripts/experimental_segmentation/SparseUnet/runs/[sparse_seunet]-[512]/[brightfield_nuc]-[sigmoid_iam]-[multi_level=True]-[coord_conv=False]-[losses=['labels', 'masks']]/[2023-07-08 12:37:28]")
+    # experiment_path = Path("/gpfs/space/home/prytula/scripts/experimental_segmentation/SparseUnet/runs/[sparse_]-[512]/[brightfield_nuc]-[sigmoid_iam]-[multi_level=True]-[coord_conv=False]-[losses=['labels', 'masks']]/[2023-07-08 12:37:28]")
     # experiment_path = Path("/gpfs/space/home/prytula/scripts/experimental_segmentation/SparseUnet/runs/[sparse_seunet]-[512]/[rectangle]-[softmax_iam]-[multi_level=True]-[coord_conv=False]-[losses=['labels', 'masks', 'iam']]/[2023-07-07 19:56:09]")
     # experiment_path = Path("/gpfs/space/home/prytula/scripts/experimental_segmentation/SparseUnet/runs/[sparse_seunet]-[512]/[brightfield_nuc]-[sigmoid_iam]-[multi_level=True]-[coord_conv=False]-[losses=['labels', 'masks']]/[2023-07-09 01:59:04]")
     # experiment_path = Path("/gpfs/space/home/prytula/scripts/experimental_segmentation/SparseUnet/runs/[sparse_seunet]-[512]/[brightfield_nuc]-[sigmoid_iam]-[multi_level=True]-[coord_conv=False]-[losses=['labels', 'masks']]/[2023-07-09 09:39:28]")
 
     # experiment_path = Path("/gpfs/space/home/prytula/scripts/experimental_segmentation/SparseUnet/runs/[sparse_seunet]-[512]/[rectangle]-[sigmoid_iam]-[multi_level=True]-[coord_conv=False]-[losses=['labels', 'masks']]/[job=43858538]-[2023-07-10 01:04:24]")
-    
+
     # experiment_path = Path("/gpfs/space/home/prytula/scripts/experimental_segmentation/SparseUnet/runs/[sparse_seunet]-[512]/[rectangle]-[softmax_iam]-[multi_level=True]-[coord_conv=True]-[losses=['labels', 'masks']]/[job=43910856]-[2023-07-10 16:34:00]")
-    
+
     # best rectangle.
     # experiment_path = Path("/gpfs/space/home/prytula/scripts/experimental_segmentation/SparseUnet/runs/[sparse_seunet]-[512]/[rectangle]-[softmax_iam]-[multi_level=True]-[coord_conv=True]-[losses=['labels', 'masks']]/[job=44023978]-[2023-07-12 11:14:21]")
     # experiment_path = Path("/gpfs/space/home/prytula/scripts/experimental_segmentation/SparseUnet/runs/[sparse_seunet]-[512]/[rectangle]-[softmax_iam]-[multi_level=True]-[coord_conv=False]-[losses=['labels', 'masks']]/[job=44039077]-[2023-07-12 15:17:40]")
 
-    
-    
+
+
     # no ovlp
     # experiment_path = Path("/gpfs/space/home/prytula/scripts/experimental_segmentation/SparseUnet/runs/[sparse_seunet_add_overlaps]-[512]/[rectangle]/[softmax_iam]/[multi_level=True]-[coord_conv=True]-[losses=['labels', 'masks']]/[job=45675080]-[2023-08-04 10:12:49]")
-    
+
     # ovlp + inst | single iam
     # experiment_path = Path("/gpfs/space/home/prytula/scripts/experimental_segmentation/SparseUnet/runs/[sparse_seunet_add_overlaps]-[512]/[rectangle]/[softmax_iam]/[multi_level=True]-[coord_conv=True]-[losses=['labels', 'masks', 'overlaps']]/[job=45677956]-[2023-08-04 12:12:01]")
-    
+
     # ovlp, inst | group iam
     # experiment_path = Path("/gpfs/space/home/prytula/scripts/experimental_segmentation/SparseUnet/runs/[sparse_seunet_add_overlaps]-[512]/[rectangle]/[softmax_iam]/[multi_level=True]-[coord_conv=True]-[losses=['labels', 'masks', 'overlaps']]/[job=45736477]-[2023-08-05 13:42:26]")
-    
+
     # ovlp -> pob(ovlp), inst | group iam
     # experiment_path = Path("/gpfs/space/home/prytula/scripts/experimental_segmentation/SparseUnet/runs/[sparse_seunet_add_overlaps]-[512]/[rectangle]/[softmax_iam]/[multi_level=True]-[coord_conv=True]-[losses=['labels', 'masks', 'overlaps']]/[job=45752670]-[2023-08-05 18:12:46]")
-    
+
     # (ovlp * inst), inst | group iam
     # experiment_path = Path("/gpfs/space/home/prytula/scripts/experimental_segmentation/SparseUnet/runs/[sparse_seunet_add_overlaps]-[512]/[rectangle]/[softmax_iam]/[multi_level=True]-[coord_conv=True]-[losses=['labels', 'masks', 'overlaps']]/[job=45753376]-[2023-08-05 18:21:54]")
-    
+
     # cat(ovlp, inst) -> pob(ovlp), inst | group iam
     # experiment_path = Path("/gpfs/space/home/prytula/scripts/experimental_segmentation/SparseUnet/runs/[sparse_seunet_add_overlaps]-[512]/[rectangle]/[softmax_iam]/[multi_level=True]-[coord_conv=True]-[losses=['labels', 'masks', 'overlaps']]/[job=45772926]-[2023-08-06 01:01:20]")
 
@@ -296,12 +296,12 @@ if __name__ == '__main__':
 
     # experiment_path = Path("/gpfs/space/home/prytula/scripts/experimental_segmentation/SparseUnet/runs/[sparse_seunet_add_overlaps]-[512]/[rectangle]/[softmax_iam]/[multi_level=True]-[coord_conv=True]-[losses=['labels', 'masks', 'overlaps']]/[job=45820412]-[2023-08-06 21:19:18]")
     # experiment_path = Path("/gpfs/space/home/prytula/scripts/experimental_segmentation/SparseUnet/runs/[sparse_seunet_add_overlaps]-[512]/[rectangle]/[softmax_iam]/[multi_level=True]-[coord_conv=True]-[losses=['labels', 'masks', 'overlaps']]/[job=45817975]-[2023-08-06 20:41:18]")
-    
+
     # experiment_path = Path("/gpfs/space/home/prytula/scripts/experimental_segmentation/SparseUnet/runs/[sparse_seunet]-[512]/[brightfield]/[softmax_iam]/[multi_level=True]-[coord_conv=True]-[losses=['labels', 'masks']]/[job=45867499]-[2023-08-07 11:44:24]")
 
     # experiments = [
     #     # Path("/gpfs/space/home/prytula/scripts/experimental_segmentation/SparseUnet/runs/[sparse_seunet_add_overlaps]-[512]/[rectangle]/[softmax_iam]/[multi_level=True]-[coord_conv=True]-[losses=['labels', 'masks', 'overlaps']]/[job=45820412]-[2023-08-06 21:19:18]")
-        
+
     #     # Path("/gpfs/space/home/prytula/scripts/experimental_segmentation/SparseUnet/runs/[sparse_seunet_add_overlaps]-[512]/[rectangle]/[softmax_iam]/[multi_level=True]-[coord_conv=True]-[losses=['labels', 'masks', 'overlaps']]/[job=45977581]-[2023-08-08 20:59:37]"),
     #     Path("/gpfs/space/home/prytula/scripts/experimental_segmentation/SparseUnet/runs/[sparse_seunet]-[512]/[rectangle]/[softmax_iam]/[multi_level=True]-[coord_conv=True]-[losses=['labels', 'masks']]/[job=46036037]-[2023-08-09 13:25:51]"),
     #     Path("/gpfs/space/home/prytula/scripts/experimental_segmentation/SparseUnet/runs/[sparse_seunet_add_overlaps]-[512]/[rectangle]/[softmax_iam]/[multi_level=True]-[coord_conv=True]-[losses=['labels', 'masks', 'overlaps']]/[job=46034550]-[2023-08-09 13:00:46]"),
@@ -323,7 +323,7 @@ if __name__ == '__main__':
 
     # experiment_path = Path("/gpfs/space/home/prytula/scripts/experimental_segmentation/SparseUnet/runs/[sparse_seunet]-[512]/[synthetic_brightfield]/[softmax_iam]/[multi_level=True]-[coord_conv=True]-[losses=['labels', 'masks']]/[job=46860262]-[2023-08-21 15:48:36]")
     # experiment_path = Path("/gpfs/space/home/prytula/scripts/experimental_segmentation/SparseUnet/runs/[sparse_seunet]-[512]/[brightfield]/[softmax_iam]/[multi_level=True]-[coord_conv=True]-[losses=['labels', 'masks']]/[job=47119523]-[2023-08-26 20:54:15]")
-    
+
     experiment_path = Path("/gpfs/space/home/prytula/scripts/experimental_segmentation/SparseUnet/runs/[hornet]-[512]/[brightfield]/[softmax_iam]/[multi_level=False]-[coord_conv=True]-[losses=['labels', 'masks']]/[job=47819353]-[2023-09-06 14:18:50]")
     # experiment_path = Path("/gpfs/space/home/prytula/scripts/experimental_segmentation/SparseUnet/runs/[sparse_seunet]-[512]/[brightfield]/[softmax_iam]/[multi_level=True]-[coord_conv=True]-[losses=['labels', 'masks']]/[job=47322537]-[2023-08-30 14:16:24]")
     # experiment_path = Path("/gpfs/space/home/prytula/scripts/experimental_segmentation/SparseUnet/runs/[sparse_seunet]-[512]/[brightfield]/[softmax_iam]/[multi_level=True]-[coord_conv=True]-[losses=['labels', 'masks']]/[job=47344335]-[2023-08-30 18:08:43]")
@@ -334,7 +334,7 @@ if __name__ == '__main__':
     #     'data/datasets/synthetic_datasets/rectangle/rectangles_[n=100]_[R_min=2_R_max=15]_[06.08.23].json',
     #     # 'data/datasets/synthetic_datasets/rectangle/rectangles_[n=100]_[R_min=2_R_max=5]_[06.08.23].json'
     # ]
-    
+
     # for experiment_path in experiments:
     #     print(experiment_path)
 
@@ -350,7 +350,7 @@ if __name__ == '__main__':
     # cfg.dataset.coco_dataset = join(cfg.project.home_dir, dataset)
     # cfg.dataset.coco_dataset = join(cfg.project.home_dir, f'data/datasets/synthetic_datasets/rectangle/rectangles_[n=100]_[R_min=2_R_max=15]_[06.08.23].json')
     # cfg.dataset.coco_dataset = join(cfg.project.home_dir, f'data/datasets/synthetic_datasets/rectangle/rectangles_[n=100]_[R_min=2_R_max=5]_[06.08.23].json')
-    
+
     # TODO: make load_pretrained unified from loading pretrained model and model from file (weights_path)
     cfg.model.weights = experiment_path / "checkpoints/best.pth"
     cfg.model.load_pretrained = True
@@ -389,7 +389,7 @@ if __name__ == '__main__':
 
 # model = build_model(cfg)
 # results = inference_on_dataset(
-#     model, 
-#     valid_loader, 
+#     model,
+#     valid_loader,
 #     Evaluators([DataloaderEvaluator(...)]))
 

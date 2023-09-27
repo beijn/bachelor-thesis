@@ -1,0 +1,118 @@
+Mon Sep 25 17:28:20 2023       
++---------------------------------------------------------------------------------------+
+| NVIDIA-SMI 530.30.02              Driver Version: 530.30.02    CUDA Version: 12.1     |
+|-----------------------------------------+----------------------+----------------------+
+| GPU  Name                  Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf            Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|                                         |                      |               MIG M. |
+|=========================================+======================+======================|
+|   0  Tesla V100-SXM2-32GB            Off| 00000000:1B:00.0 Off |                    0 |
+| N/A   35C    P0               55W / 300W|      0MiB / 32768MiB |      1%      Default |
+|                                         |                      |                  N/A |
++-----------------------------------------+----------------------+----------------------+
+                                                                                         
++---------------------------------------------------------------------------------------+
+| Processes:                                                                            |
+|  GPU   GI   CI        PID   Type   Process name                            GPU Memory |
+|        ID   ID                                                             Usage      |
+|=======================================================================================|
+|  No running processes found                                                           |
++---------------------------------------------------------------------------------------+
+{
+    "dataset": {
+        "coco_dataset": "/gpfs/space/home/prytula/data/datasets/synthetic_datasets/rectangle/rectangles_[S_min=50_S_max=200]_[n=1000]_[R_min=2_R_max=3]_[overlap=0.3-0.8]_[12.09.23].json",
+        "name": "rectangle"
+    },
+    "image": {
+        "size": 1080
+    },
+    "model": {
+        "arch": "sparse_seunet",
+        "coord_conv": true,
+        "criterion": {
+            "losses": [
+                "labels",
+                "masks"
+            ],
+            "matcher": {
+                "cost_cls": 2.0,
+                "cost_dice": 1.0,
+                "cost_mask": 5.0,
+                "type": "HungarianMatcher"
+            },
+            "num_classes": 1,
+            "type": "SparseCriterion",
+            "weights": {
+                "bce_masks": 5.0,
+                "dice_masks": 1.0,
+                "focal_masks": 5.0,
+                "labels": 2.0,
+                "no_object_weight": 0.1
+            }
+        },
+        "evaluator": {
+            "cls_thr": 0.5,
+            "mask_thr": 0.4,
+            "type": "DataloaderEvaluator"
+        },
+        "in_channels": 2,
+        "kernel_dim": 256,
+        "load_from_files": false,
+        "load_pretrained": false,
+        "model_files": "/gpfs/space/home/prytula/scripts/experimental_segmentation/SparseUnet/runs/[sparse_seunet]-[512]/[rectangle]/[softmax_iam]/[multi_level=True]-[coord_conv=True]-[losses=['labels', 'masks']]/[job=46036037]-[2023-08-09 13:25:51]/model_files",
+        "multi_level": true,
+        "n_levels": 5,
+        "num_classes": 1,
+        "num_convs": 4,
+        "num_groups": 1,
+        "num_masks": 50,
+        "out_channels": 1,
+        "save_checkpoint": false,
+        "save_model_files": true,
+        "weights": ""
+    },
+    "project": {
+        "home_dir": "/gpfs/space/home/prytula",
+        "project_id": "project-2-at-2022-05-20-09-23-83cd15f1",
+        "work_dir": "/gpfs/space/home/prytula/data/mask_labels/x63_fl"
+    },
+    "run": {
+        "comment": "\n                                - wd = 1e-4\n                                - no overlap supression in the dataset\n                                - overlaps\n                                - added BatchNorm2d to stacked 3x3 convolutions\n                                - fixed sigmoid iam\n                              ",
+        "exist_ok": false,
+        "experiment_name": "[sparse_seunet]-[512]",
+        "run_name": "[rectangle]/[softmax_iam]/[multi_level=True]-[coord_conv=True]-[losses=['labels', 'masks']]/[job=48371698]-[2023-09-25 17:28:41]",
+        "runs_dir": "runs"
+    },
+    "train": {
+        "augment": true,
+        "batch_size": 2,
+        "epochs": 1001,
+        "n_folds": 5,
+        "size": [
+            512,
+            512
+        ]
+    },
+    "valid": {
+        "batch_size": 1,
+        "size": [
+            512,
+            512
+        ]
+    }
+}
+{'dataset': {'coco_dataset': '/gpfs/space/home/prytula/data/datasets/synthetic_datasets/rectangle/rectangles_[S_min=50_S_max=200]_[n=1000]_[R_min=2_R_max=3]_[overlap=0.3-0.8]_[12.09.23].json', 'name': 'rectangle'}, 'image': {'size': 1080}, 'model': {'arch': 'sparse_seunet', 'coord_conv': True, 'criterion': {'type': 'SparseCriterion', 'losses': ['labels', 'masks'], 'weights': {'labels': 2.0, 'focal_masks': 5.0, 'bce_masks': 5.0, 'dice_masks': 1.0, 'no_object_weight': 0.1}, 'matcher': {'type': 'HungarianMatcher', 'cost_dice': 1.0, 'cost_cls': 2.0, 'cost_mask': 5.0}, 'num_classes': 1}, 'evaluator': {'type': 'DataloaderEvaluator', 'mask_thr': 0.4, 'cls_thr': 0.5}, 'in_channels': 2, 'kernel_dim': 256, 'load_from_files': False, 'load_pretrained': False, 'model_files': "/gpfs/space/home/prytula/scripts/experimental_segmentation/SparseUnet/runs/[sparse_seunet]-[512]/[rectangle]/[softmax_iam]/[multi_level=True]-[coord_conv=True]-[losses=['labels', 'masks']]/[job=46036037]-[2023-08-09 13:25:51]/model_files", 'multi_level': True, 'n_levels': 5, 'num_classes': 1, 'num_convs': 4, 'num_groups': 1, 'num_masks': 50, 'out_channels': 1, 'save_checkpoint': False, 'save_model_files': True, 'weights': ''}, 'project': {'home_dir': '/gpfs/space/home/prytula', 'project_id': 'project-2-at-2022-05-20-09-23-83cd15f1', 'work_dir': '/gpfs/space/home/prytula/data/mask_labels/x63_fl'}, 'run': {'comment': '\n                                - wd = 1e-4\n                                - no overlap supression in the dataset\n                                - overlaps\n                                - added BatchNorm2d to stacked 3x3 convolutions\n                                - fixed sigmoid iam\n                              ', 'exist_ok': False, 'experiment_name': '[sparse_seunet]-[512]', 'run_name': "[rectangle]/[softmax_iam]/[multi_level=True]-[coord_conv=True]-[losses=['labels', 'masks']]/[job=48371698]-[2023-09-25 17:28:41]", 'runs_dir': 'runs'}, 'train': {'augment': True, 'batch_size': 2, 'epochs': 1001, 'n_folds': 5, 'size': [512, 512]}, 'valid': {'batch_size': 1, 'size': [512, 512]}}
+loading annotations into memory...
+Traceback (most recent call last):
+  File "/gpfs/space/home/eckhardt/thesis/yaroslav/main.py", line 113, in <module>
+    run(cfg)
+  File "/gpfs/space/home/eckhardt/thesis/yaroslav/main.py", line 64, in run
+    train_dataset = dataset(cfg, 
+                    ^^^^^^^^^^^^
+  File "/gpfs/space/home/eckhardt/thesis/yaroslav/dataset/datasets/rectangle.py", line 24, in __init__
+    self.coco = COCO(join(cfg.dataset.coco_dataset))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/gpfs/space/home/eckhardt/.micromamba/envs/yaroslav/lib/python3.11/site-packages/pycocotools/coco.py", line 81, in __init__
+    with open(annotation_file, 'r') as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/gpfs/space/home/prytula/data/datasets/synthetic_datasets/rectangle/rectangles_[S_min=50_S_max=200]_[n=1000]_[R_min=2_R_max=3]_[overlap=0.3-0.8]_[12.09.23].json'

@@ -5,6 +5,7 @@ dependencies:
 - albumentations
 - einops
 - fvcore
+- iopath
 - ipython
 - matplotlib
 - numpy
