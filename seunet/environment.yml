@@ -1,0 +1,25 @@
+name: yaroslav
+channels:
+- conda-forge
+dependencies:
+- albumentations
+- einops
+- fvcore
+- ipython
+- matplotlib
+- numpy
+- pandas
+- pip
+- pycocotools
+- pytorch
+- scikit-image
+- scikit-learn
+- scipy
+- tifffile
+- timm
+- torchvision
+- tqdm
+- typing_extensions
+- pip:
+  - opencv-python
+  - opencv-python-headless
