@@ -1,0 +1,8 @@
+name: micro-sam
+channels:
+- conda-forge
+dependencies:
+- micro_sam  # lib
+- napari  # annotate
+- pyqt  # annotate
+- torch_em  # train
