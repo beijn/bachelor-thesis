@@ -1,0 +1,8 @@
+name: stardist
+channels:
+- conda-forge
+dependencies:
+- stardist
+
+- matplotlib  # for plots
+- ipykernel  # for notebooks
