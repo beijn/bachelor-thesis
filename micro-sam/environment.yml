@@ -6,3 +6,8 @@ dependencies:
 - napari  # annotate
 - pyqt  # annotate
 - torch_em  # train
+
+- matplotlib  # for plots
+- ipykernel  # for notebooks
+
+- scikit-image  # for blob-detectio
