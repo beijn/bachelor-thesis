@@ -1,0 +1,10 @@
+several ~/.micromamba/envs/NAME
+
+
+~/DATA/LIVECell_dataset_2021"
+
+
+~/.cellpose
+
+~/.sam_models
+

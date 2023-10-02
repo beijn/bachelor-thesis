@@ -1,0 +1,15 @@
+#!bash
+
+# needs  micromamba activate thesis && ./gpu
+echo "needs 'conda activate ...' where 'papermill' is installed"
+
+OUTDIR=result
+
+cd "$(dirname "$1")"
+mkdir "$OUTDIR" 2>/dev/null || true
+
+
+SLURM_ARGS="-p gpu --gres gpu:tesla:1 --cpus-per-task=10 --mem=40G --time 1200"
+
+srun $SLURM_ARGS\
+  papermill "$(basename "$1")" "$OUTDIR/$(basename "$1" .ipynb).$(date +%y%m%d-%H%M%S).ipynb"

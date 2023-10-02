@@ -1,6 +1,10 @@
 #!/bin/bash
-
 # see https://sartorius-research.github.io/LIVECell/
+
+
+DATADIR="$HOME/DATA"
+
+echo -e "\n\e[1;32m   >>=  Installing LIVECell data set into '$DATADIR'  =<<   \e[0m\n"
 
 
 curl -H "GET /?list-type=2 HTTP/1.1" \
@@ -10,14 +14,15 @@ curl -H "GET /?list-type=2 HTTP/1.1" \
 
 grep -oPm1 "(?<=<Key>)[^<]+" files.xml | sed -e 's/^/http:\/\/livecell-dataset.s3.eu-central-1.amazonaws.com\//' > urls.txt
 
-mkdir -p LIVECell_dataset_2021/{annotations,models,nuclear_count_benchmark}
-
-
 cat urls.txt | grep -E "image|annotation|nuclear_count_benchmark" > urls2.txt
 mv urls2.txt urls.txt
 
+
+mkdir -p "$DATADIR"/DATA/LIVECell_dataset_2021/{annotations,models,nuclear_count_benchmark}
+
+
 while IFS="" read -r url || [ -n "$url" ]; do
-  FILE="${url#"http://livecell-dataset.s3.eu-central-1.amazonaws.com/"}"
+  FILE="$DATADIR/${url#"http://livecell-dataset.s3.eu-central-1.amazonaws.com/"}"
   wget "$url" -nc -O "$FILE"
   unzip -n "$FILE" -d "$(dirname "$FILE")"
 done < urls.txt

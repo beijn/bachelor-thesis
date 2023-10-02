@@ -1,4 +1,4 @@
-name: yaroslav
+name: seunet
 channels:
 - conda-forge
 dependencies:
