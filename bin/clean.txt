@@ -1,7 +1,9 @@
 several ~/.micromamba/envs/NAME
 
 
-~/DATA/LIVECell_dataset_2021"
+~/DATA/LIVECell_dataset_2021
+
+~/CACHE/micro-sam
 
 
 ~/.cellpose
