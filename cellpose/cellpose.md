@@ -14,4 +14,4 @@
 
 ---
 
-o get data
+go get data

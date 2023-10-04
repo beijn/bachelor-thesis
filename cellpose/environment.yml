@@ -7,3 +7,5 @@ dependencies:
 
 - matplotlib  # for plots
 - ipykernel  # for notebooks
+
+- scikit-image   # for segmentation plots (color.label2rgb) and image reading and to grayscale
