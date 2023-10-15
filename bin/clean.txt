@@ -3,10 +3,8 @@ several ~/.micromamba/envs/NAME
 
 ~/DATA/LIVECell_dataset_2021
 
-~/CACHE/micro-sam
-
-
 ~/.cellpose
 
+~/.cache/micro-sam
 ~/.sam_models
 
