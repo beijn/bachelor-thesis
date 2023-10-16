@@ -2,10 +2,9 @@
 #SBATCH -J ipynb
 #SBATCH -t 06:59:00
 #SBATCH --ntasks=1
-#SBATCH --mem=40G
-#SBATCH --cpus-per-task=10
-#SBATCH --partition=gpu
-#SBATCH --gres=gpu:tesla:1
+#SBATCH --mem=8G
+#SBATCH --cpus-per-task=2
+#SBATCH --partition=main
 #SBATCH --mail-user=benjamin.eckhardt@ut.ee
 
 
@@ -13,15 +12,9 @@ FILE="$1"
 NAME="$(basename "$FILE" .py)"
 DIR="$(dirname "$FILE")"
 ENV="$(basename "$(dirname "$FILE")")"
-OUTDIR="$HOME/thesis/runs/$ENV/$NAME"
+OUTDIR="~/thesis/runs/$ENV/$NAME"
 
-RESULT="$(date +%y%m%d-%H%M%S)"
-if [ $# = 2 ]; then
-  RESULT="$2.$RESULT"
-fi
-RESULT="$OUTDIR/$RESULT"
-
-echo; echo; echo "  ===  RUNNING  $FILE  ===  "; echo 
+cd "$DIR"
 
 
 micromamba shell init --shell=bash --prefix=~/.micromamba   >/dev/null
@@ -29,6 +22,9 @@ eval "$(micromamba shell hook --shell=bash)"                >/dev/null
 micromamba activate "$ENV"                                  >/dev/null
 
 
+nvidia-smi
+
+
 mkdir -p "$OUTDIR"
 
-jupytext --to notebook --execute -o "$RESULT.ipynb" "$FILE"
+jupytext --to notebook --execute -o "$OUTDIR/$(date +%y%m%d-%H%M%S).ipynb" "$FILE"
