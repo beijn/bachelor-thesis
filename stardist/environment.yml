@@ -4,5 +4,11 @@ channels:
 dependencies:
 - stardist
 
-- matplotlib  # for plots
-- ipykernel  # for notebooks
+- matplotlib
+- colorcet
+
+- ipykernel
+- nbconvert
+- jupytext
+
+- pandas

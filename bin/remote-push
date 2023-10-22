@@ -1,0 +1,11 @@
+#!/usr/bin/bash
+
+LOCALDIR="/desk/Thesis/thesis"
+
+REMOTE="eckhardt@rocket.hpc.ut.ee"
+
+REMOTEDIR="~"
+
+rsync -vPzr --executability --filter=':e- .gitignore' --filter "- .git/" --delete-after --exclude 'thesis/runs' -e  ssh "$LOCALDIR" "$REMOTE":"$REMOTEDIR"
+
+echo "  >> remote adapted to local <<  "

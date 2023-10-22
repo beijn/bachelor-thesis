@@ -1,0 +1,57 @@
+name: thesis
+
+channels:
+- conda-forge
+
+dependencies:
+- python
+  
+- ipykernel  # for notebooks
+- nbconvert
+- jupytext
+
+- matplotlib  # for plots
+- scikit-image
+- colorcet
+
+# cellpose
+- cellpose[gui]
+
+# label-studio
+- pip
+- pip:
+  - label-studio
+  - label-studio-sdk
+
+# micro-sam
+- micro_sam  # lib
+- napari  # annotate
+- pyqt  # annotate
+- torch_em  # train
+
+# seunet
+- albumentations
+- einops
+- fvcore
+- iopath
+- ipython
+- matplotlib
+- numpy
+- pandas
+- pycocotools
+- pytorch
+- scikit-image
+- scikit-learn
+- scipy
+- tifffile
+- timm
+- torchvision
+- tqdm
+- typing_extensions
+- pip
+- pip:
+  - opencv-python
+  - opencv-python-headless
+
+# stardist
+- stardist

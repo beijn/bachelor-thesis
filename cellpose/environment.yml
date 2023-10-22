@@ -7,5 +7,6 @@ dependencies:
 
 - matplotlib  # for plots
 - ipykernel  # for notebooks
+- jupytext
 
 - scikit-image

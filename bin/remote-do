@@ -1,0 +1,3 @@
+#!/usr/bin/bash
+
+ssh -t eckhardt@rocket.hpc.ut.ee "cd thesis && $@"

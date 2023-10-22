@@ -1,0 +1,52 @@
+#!/bin/bash
+#SBATCH -J ipynb
+#SBATCH -t 06:59:00
+#SBATCH --ntasks=1
+#SBATCH --mem=8G
+#SBATCH --cpus-per-task=2
+#SBATCH --partition=main
+#SBATCH --mail-user=benjamin.eckhardt@ut.ee
+#SBATCH -o runs/%j.cpu.out # STDOUT
+
+
+#NOTE its the same as run but with less memory and no gpu
+
+
+
+STARTTIME="$(date +%y%m%d-%H%M%S)"
+FILE="$1"
+TAG="$2"
+NAME="$(basename "$FILE" .py)"
+SUBDIR="$(dirname "$FILE")"   # NOTE this is designed to run relative to ~/thesis
+if [ "$SUBDIR" = "" ]; then SUBDIR="."; fi
+ENV="$(basename "$SUBDIR")"
+if [ "$SUBDIR" = "." ]; then ENV='thesis'; fi
+OUTDIR="$HOME/thesis/runs/$SUBDIR/$NAME"
+WORKING="$SUBDIR/$SLURM_JOBID.ipynb"
+
+mkdir -p "$OUTDIR"
+
+
+echo; echo; echo "  ===  RUNNING  $FILE  ===  "; echo
+
+
+micromamba shell init --shell=bash --prefix=~/.micromamba   >/dev/null
+eval "$(micromamba shell hook --shell=bash)"                >/dev/null
+micromamba activate "$ENV"                                  >/dev/null
+
+
+SECONDS=0
+jupytext --to notebook --execute -o "$WORKING" "$FILE"
+
+duration=$SECONDS
+RUNTIME="$(date -ud "@$duration" +%H%M%S)"
+echo; echo "Notebook execution time $RUNTIME (HHMMSS)"
+
+RESULT="$OUTDIR/$STARTTIME-$RUNTIME"
+if [ $# = 2 ]; then
+  RESULT="$RESULT-$2"; fi
+RESULT="$RESULT.ipynb"
+
+mv "$WORKING" "$RESULT"
+
+echo "Saved to $RESULT"

@@ -7,7 +7,10 @@ dependencies:
 - pyqt  # annotate
 - torch_em  # train
 
-- matplotlib  # for plots
-- ipykernel  # for notebooks
+- scikit-image
+- matplotlib
+- colorcet
 
-- scikit-image  # for blob-detectio
+- jupytext
+- nbconvert
+- ipykernel

@@ -1,0 +1,3 @@
+#!/usr/bin/bash
+
+bin/remote-do sbatch bin/run "$@"
