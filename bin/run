@@ -18,8 +18,8 @@ SUBDIR="$(dirname "$FILE")"   # NOTE this is designed to run relative to ~/thesi
 if [ "$SUBDIR" = "" ]; then SUBDIR="."; fi
 ENV="$(basename "$SUBDIR")"
 if [ "$SUBDIR" = "." ]; then ENV='thesis'; fi
-OUTDIR="$HOME/thesis/runs/$SUBDIR/$NAME"
-WORKING="$SUBDIR/$SLURM_JOBID.ipynb"
+OUTDIR="./runs/$SUBDIR/$NAME"
+WORKING="$SUBDIR/$(sha1sum "$FILE" | cut -c-9).ipynb"
 
 mkdir -p "$OUTDIR"
 

@@ -50,7 +50,7 @@ def preprocess_point(annot):
     ))], ignore_index=True)
 
   return out
-annot = preprocess_point(_annot); annot
+points = preprocess_point(_annot).to_numpy()
 
 # %%
 
@@ -60,6 +60,10 @@ def plot_points(image, points):
   ax.axis('off')
 
   ax.imshow(image)
-  ax.scatter(points.x, points.y, s=10, c='red', marker='o')
+  ax.scatter(points[:,0], points[:,1], s=10, c='red', marker='o')
 
-plot_points(image, annot)
+plot_points(image, points)
+
+# %%
+
+

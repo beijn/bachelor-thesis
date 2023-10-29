@@ -22,7 +22,7 @@ if [ "$SUBDIR" = "" ]; then SUBDIR="."; fi
 ENV="$(basename "$SUBDIR")"
 if [ "$SUBDIR" = "." ]; then ENV='thesis'; fi
 OUTDIR="$HOME/thesis/runs/$SUBDIR/$NAME"
-WORKING="$SUBDIR/$SLURM_JOBID.ipynb"
+WORKING="$SUBDIR/$(sha1sum "$FILE" | cut -c-9).ipynb"
 
 mkdir -p "$OUTDIR"
 
