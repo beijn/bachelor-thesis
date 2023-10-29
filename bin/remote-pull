@@ -1,11 +1,7 @@
 #!/usr/bin/bash
 
-LOCALDIR="/desk/Thesis/thesis"
+source bin/vars.sh  # NOTE: this is designed to be run from REPO root
 
-REMOTE="eckhardt@rocket.hpc.ut.ee"
-
-REMOTEDIR="~/thesis/runs"
-
-rsync -vPzr --filter=':e- .gitignore' --filter "- .git/" -e ssh "$REMOTE":"$REMOTEDIR" "$LOCALDIR"
+rsync -vPzr --filter=':e- .gitignore' --filter "- .git/" -e ssh "$REMOTE/$REPO/runs" "$LOCAL/$REPO"
 
 echo "  >> pulled remote results. <<  "

@@ -1,25 +1,24 @@
 #!/usr/bin/bash
 
-
-LOCALDIR="/desk/Thesis"
-REMOTEDIR="eckhardt@rocket.hpc.ut.ee:~"
+source bin/vars.sh  # NOTE: this is designed to be run from REPO root
 
 
 if [ "$1" = "push" ]; then
     echo "  >> push overwriting to remote. PLEASE CONFIRM <<  "
-    SRC="$LOCALDIR/thesis"
-    DEST="$REMOTEDIR"
+    SRC="$LOCAL"
+    DEST="$REMOTE"
 elif [ "$1" = "pull" ]; then
     echo "  >> pull overwriting from remote. PLEASE CONFIRM <<  "
-    SRC="$REMOTEDIR/thesis"
-    DEST="$LOCALDIR"
+    SRC="$REMOTE"
+    DEST="$LOCAL"
 else
     echo "  >> please specify push to or pull from remote (note that this script overwrites!) <<  "
     exit 1
 fi
 
-read -p "  >> are you sure? (y/n) <<  " -n 1 -r
+read -p "  >> are you sure? Cancel with ^C <<  " -n 1 -r  
 
-rsync -vPzr --executability --filter=':e- .gitignore' --filter "- .git/" --delete-after --exclude 'thesis/.git' -e ssh "$SRC" "$DEST"
+rsync -vPzr --executability --filter=':e- .gitignore' --filter "- .git/" \
+  --delete-after --exclude 'thesis/.git' -e ssh "$SRC/$REPO" "$DEST"
 
 echo "  >> done <<  "

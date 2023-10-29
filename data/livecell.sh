@@ -2,7 +2,7 @@
 # see https://sartorius-research.github.io/LIVECell/
 
 
-DATADIR="$HOME/DATA"
+DATADIR="$HOME/.cache/thesis/data"
 
 echo -e "\n\e[1;32m   >>=  Installing LIVECell data set into '$DATADIR'  =<<   \e[0m\n"
 

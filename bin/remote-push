@@ -1,11 +1,8 @@
 #!/usr/bin/bash
 
-LOCALDIR="/desk/Thesis/thesis"
+source bin/vars.sh  # NOTE: this is designed to be run from REPO root
 
-REMOTE="eckhardt@rocket.hpc.ut.ee"
-
-REMOTEDIR="~"
-
-rsync -vPzr --executability --filter=':e- .gitignore' --filter "- .git/" --delete-after --exclude 'thesis/runs' -e  ssh "$LOCALDIR" "$REMOTE":"$REMOTEDIR"
+rsync -vPzr --executability --filter=':e- .gitignore' --filter "- .git/" \
+  --delete-after --exclude 'thesis/runs' -e  ssh "$LOCAL/$REPO" "$REMOTE"
 
 echo "  >> remote adapted to local <<  "
