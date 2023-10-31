@@ -1,0 +1,16 @@
+name: detection
+
+channels:
+- conda-forge
+
+dependencies:
+- pytorch
+- torchvision
+- pycocotools
+- opencv
+
+- ipykernel
+- jupytext
+- matplotlib
+- nbconvert
+- scikit-image
