@@ -3,7 +3,7 @@
 # see https://github.com/computational-cell-analytics/micro-sam/blob/master/examples/use_as_library/instance_segmentation.py
 
 # %%
-import sys, os; sys.path += [os.path.join(os.path.expanduser('~'), 'thesis')]  # NOTE hardcoded project root to find shared util modules
+import sys, os; sys.path += ['..']  # NOTE find shared modules
 
 from micro_sam import instance_segmentation, util
 import imageio.v3 as imageio
