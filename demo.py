@@ -11,7 +11,7 @@
 #
 
 # %%
-import sys, os; sys.path += [os.path.join(os.path.expanduser('~'), 'thesis')]  # NOTE hardcoded project root to find shared util modules
+import sys, os; sys.path += ['..']  # NOTE find shared modules
 
 import matplotlib.pyplot as plt
 import numpy as np

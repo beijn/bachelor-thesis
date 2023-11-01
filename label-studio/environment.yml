@@ -2,7 +2,8 @@ name: label-studio
 channels:
   - conda-forge
 dependencies:
+  - python==3.11
   - pip
   - pip:
-    - label-studio==1.9.1
+    - label-studio
     - label-studio-sdk

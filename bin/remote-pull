@@ -2,6 +2,6 @@
 
 source bin/vars.sh  # NOTE: this is designed to be run from REPO root
 
-rsync -vPzr --filter=':e- .gitignore' --filter "- .git/" -e ssh "$REMOTE/$REPO/runs" "$LOCAL/$REPO"
+rsync -vPzr --filter=':e- .gitignore' --filter "- .git/" -e ssh "$REMOTE~/$REPO/runs" "$LOCAL/$REPO"
 
 echo "  >> pulled remote results. <<  "

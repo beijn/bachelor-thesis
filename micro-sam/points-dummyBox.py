@@ -3,7 +3,7 @@
 # Stuart in his third datarelease provided only points for cells.. Lets see what we can do with it
 
 # %%
-import sys, os; sys.path += ['..']  # NOTE hardcoded project root to find shared util modules
+import sys, os; sys.path += ['..']  # NOTE find shared modules
 
 import os
 import itertools as it

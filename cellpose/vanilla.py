@@ -4,7 +4,7 @@
 # and https://cellpose.readthedocs.io/en/latest/outputs.html#plotting-functions
 
 # %%
-import sys, os; sys.path += [os.path.join(os.path.expanduser('~'), 'thesis')]  # NOTE hardcoded project root to find shared util modules
+import sys, os; sys.path += ['..']  # NOTE find shared modules
 
 import numpy as np
 import matplotlib.pyplot as plt
