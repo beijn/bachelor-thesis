@@ -98,7 +98,7 @@ TorchVision Object Detection Finetuning Tutorial
 #      PedMasks/
 #        FudanPed00001_mask.png
 #        FudanPed00002_mask.png
-#        FudanPed00003_mask.png
+#        FudanPed00003_mask.png 
 #        FudanPed00004_mask.png
 #        ...
 #      PNGImages/
@@ -137,11 +137,18 @@ from torchvision.transforms.v2 import functional as F
 
 
 class PennFudanDataset(torch.utils.data.Dataset):
-    def __init__(self, root, transforms):
-        self.root = root
+    def __init__(self, transforms, root='~/.cache/thesis/data'):
         self.transforms = transforms
         # load all image files, sorting them to
         # ensure that they are aligned
+        print(root)
+        os.system(f"""
+        wget -nc https://www.cis.upenn.edu/~jshi/ped_html/PennFudanPed.zip -O {root}/PennFudanPed.zip;
+        cd {root};
+        unzip -n PennFudanPed.zip;
+        """)
+        root = os.path.join(os.path.expanduser(root), "PennFudanPed")
+        self.root = root
         self.imgs = list(sorted(os.listdir(os.path.join(root, "PNGImages"))))
         self.masks = list(sorted(os.listdir(os.path.join(root, "PedMasks"))))
 
@@ -176,7 +183,7 @@ class PennFudanDataset(torch.utils.data.Dataset):
         img = tv_tensors.Image(img)
 
         target = {}
-        target["boxes"] = tv_tensors.BoundingBoxes(boxes, format="XYXY", canvas_size=F.get_size(img))
+        target["boxes"] = tv_tensors.BoundingBoxes(boxes, format="XYXY", canvas_size=img.shape[-2:])
         target["masks"] = tv_tensors.Mask(masks)
         target["labels"] = labels
         target["image_id"] = image_id
@@ -343,7 +350,7 @@ def get_model_instance_segmentation(num_classes):
 # Just download everything under ``references/detection`` to your folder and use them here.
 # On Linux if you have ``wget``, you can download them using below commands:
 
-os.system("""
+False and os.system("""
 mkdir -p lib;
 cd lib;
 wget -nc https://raw.githubusercontent.com/pytorch/vision/main/references/detection/utils.py;
@@ -351,7 +358,7 @@ wget -nc https://raw.githubusercontent.com/pytorch/vision/main/references/detect
 wget -nc https://raw.githubusercontent.com/pytorch/vision/main/references/detection/coco_eval.py;
 wget -nc https://raw.githubusercontent.com/pytorch/vision/main/references/detection/engine.py;
 wget -nc https://raw.githubusercontent.com/pytorch/vision/main/references/detection/coco_utils.py;
-""")
+""");
 
 # %% 
 
@@ -368,8 +375,8 @@ def get_transform(train):
     transforms = []
     if train:
         transforms.append(T.RandomHorizontalFlip(0.5))
-    transforms.append(T.ToDtype(torch.float, scale=True))
-    transforms.append(T.ToPureTensor())
+    transforms.append(T.ConvertImageDtype(torch.float))  #transforms.append(T.ToDtype(torch.float), scale=True))
+    #transforms.append(T.ToPureTensor())
     return T.Compose(transforms)
 
 
@@ -378,11 +385,11 @@ def get_transform(train):
 #
 # Before iterating over the dataset, it's good to see what the model
 # expects during training and inference time on sample data.
-import lib.utils as utils
+import references.utils as utils
 
 
 model = torchvision.models.detection.fasterrcnn_resnet50_fpn(weights="DEFAULT")
-dataset = PennFudanDataset('PennFudanPed', get_transform(train=True))
+dataset = PennFudanDataset(get_transform(train=True))
 data_loader = torch.utils.data.DataLoader(
     dataset,
     batch_size=2,
@@ -411,7 +418,7 @@ print(predictions[0])
 # validation:
 
 
-from lib.engine import train_one_epoch, evaluate
+from references.engine import train_one_epoch, evaluate
 
 # train on the GPU or on the CPU, if a GPU is not available
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
@@ -419,8 +426,8 @@ device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cp
 # our dataset has two classes only - background and person
 num_classes = 2
 # use our dataset and defined transformations
-dataset = PennFudanDataset('PennFudanPed', get_transform(train=True))
-dataset_test = PennFudanDataset('PennFudanPed', get_transform(train=False))
+dataset = PennFudanDataset(get_transform(train=True))
+dataset_test = PennFudanDataset(get_transform(train=False))
 
 # split the dataset in train and test set
 indices = torch.randperm(len(dataset)).tolist()
@@ -468,7 +475,7 @@ lr_scheduler = torch.optim.lr_scheduler.StepLR(
 
 # %%
 # let's train it for 5 epochs
-num_epochs = 5
+num_epochs = 2
 
 for epoch in range(num_epochs):
     # train for one epoch, printing every 10 iterations
@@ -476,7 +483,9 @@ for epoch in range(num_epochs):
     # update the learning rate
     lr_scheduler.step()
     # evaluate on the test dataset
-    evaluate(model, data_loader_test, device=device)
+
+    # NOTE: the following raises ValueError: Buffer dtype mismatch, expected 'uint8_t' but got 'float'
+    #evaluate(model, data_loader_test, device=device)
 
 print("That's it!")
 
@@ -495,8 +504,10 @@ import matplotlib.pyplot as plt
 
 from torchvision.utils import draw_bounding_boxes, draw_segmentation_masks
 
+# get tv_image05.png
+os.system("wget -nc https://raw.githubusercontent.com/pytorch/tutorials/main/_static/img/tv_tutorial/tv_image05.png")
 
-image = read_image("./tv_image05.png")
+image = read_image(f"./tv_image05.png")
 eval_transform = get_transform(train=False)
 
 model.eval()

@@ -5,9 +5,9 @@ channels:
 
 dependencies:
 - pytorch
-- torchvision
 - pycocotools
 - opencv
+- scikit-image
 
 - ipykernel
 - jupytext
