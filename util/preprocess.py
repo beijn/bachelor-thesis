@@ -2,7 +2,7 @@ import numpy as np
 import json
 
 
-def preprocess_point(annot_file = '../data/third/annotations.json'):
+def preprocess_point(annot_file = '../data/third/annotations.json', dims='yx'):
   annot = json.load(open(annot_file))
   out = np.zeros((len(annot[0]['annotations'][0]['result']), 2))
 
@@ -19,4 +19,7 @@ def preprocess_point(annot_file = '../data/third/annotations.json'):
     out[i,0] = y    # NOTE x y order
     out[i,1] = x
 
-  return out
+    if dims=='xy':
+      out[i,:] = [x,y]
+
+  return out.astype(np.int16)
