@@ -13,48 +13,41 @@ import numpy as np
 import skimage
 import matplotlib.pyplot as plt
 
+import torch
 import micro_sam
 from micro_sam import instance_segmentation, util
 
-from util.preprocess import *
+from util.points2masks_tiled import *
 from util.plot import *
+from util.preprocess import *
 
-# %%
-
-points_fg = preprocess_point('../data/third/annotations.json')
-points_bg = preprocess_point('../data/third/annot-bg.json')
 
 dataset_id = 'third'
+setup_cache(dataset_id, f'R=None')
+_, TILES = make_tiles_dummyBox(R=None)
 
+cache_dir = mk_cache(f"micro-sam/{dataset_id}/tiled-points", dirs='embed masks', clear=True)
+
+imgid = '1'
 model_type = 'vit_b'
 iou_thresh = 0.88
 
-cache_dir = os.path.join(os.path.join(os.path.expanduser('~'), '.cache', 'thesis', 'micro-sam'), dataset_id)
-[os.makedirs(os.path.join(cache_dir, d), exist_ok=True) for d in 'embed masks rles'.split(' ')];
-
-image = plt.imread("../data/third/1.jpg")
-image_slice = image[:1024, :1024, :]
-imgid_slice = '1-1024'
-# save the image
-plt.imsave(f'../data/third/{imgid_slice}.jpg', image_slice)
-
-# %%
-
 predictor = util.get_sam_model(model_type=model_type)
+tiled_masks = []
 
-def doit(imgid, points, labels, ax):
-  pImage = f"../data/{dataset_id}/{imgid}.jpg"
-  pEmbed = f"{cache_dir}/embed/{imgid}-{model_type}.zarr"
-
-  image = plt.imread(pImage)
-
+for tile in TILES:
+  img, _, pts, pts_bg = load_tile(tile)
+  pEmbed = f'{cache_dir}/embed/{tile}.zarr'
+  
   print('LOADING'  if os.path.exists(pEmbed) else
         'WRITING', f'embedding cache at {pEmbed}')
-
   embeddings = util.precompute_image_embeddings(
-    predictor, image, ndim = 2, save_path=pEmbed,
-    tile_shape=(tile:=1024, tile), halo=(halo:=tile//4, halo)
+    predictor, img, ndim = 2, save_path = pEmbed,
+    # NOTE: we dont use µSAM built in tiling because its bad with out huge multi-tile BG
   )
+
+  points = np.concatenate([pts_bg, pts])
+  labels = np.concatenate([np.ones(len(pts_bg)), np.zeros(len(pts))])
 
   mask = micro_sam.prompt_based_segmentation.segment_from_points(
       predictor=predictor,
@@ -63,34 +56,18 @@ def doit(imgid, points, labels, ax):
       labels=labels,
     )[0]
 
-  ax.set_title(f"µSAM (vanilla {model_type}) - BG/FG from point promts: {dataset_id}/{imgid}.jpg")
-  ax.axis('off')
+  tiled_masks.append(mask)
 
-  ax.imshow(skimage.color.label2rgb(
-    mask, image, saturation=1, bg_color=None, alpha=0.5, colors=[[.25,0,.5]])
-  )
-
-  ax.scatter(points[:,1], points[:,0], c=['cyan' if l else 'red' for l in labels], s=10)
-
-  return mask
-
-
-fig, (a,b,c,d,e,f) = plt.subplots(6,1, figsize=(14, 10*6))
-plt.tight_layout()
-
-points_both = np.concatenate([points_fg, points_bg])
-labels_both = np.concatenate([np.ones(len(points_fg)), np.zeros(len(points_bg))])
-
-doit(1, points_fg, np.ones(len(points_fg)), a)
-doit(1, points_fg, np.zeros(len(points_fg)), c)
-doit(1, points_both, labels_both, b)
-mask = doit(1, points_both, 1-labels_both, d)
-doit('1-1024', points_both, labels_both, e)
-doit('1-1024', points_both, 1-labels_both, f)
+plot_tiles(imgid, posts=[
+  lambda ax, X: ax.imshow(ski.color.label2rgb(tiled_masks[X['idx']], X['img'], saturation=1, bg_color=None, alpha=0.5, colors=[[.25,0,.5]])),
+], 
+suptitle=f"µSAM (vanilla {model_type}) - BG/FG from point promts: {dataset_id}/{imgid}.jpg")
+ 
 
 
 # %% [markdown]
-
+# ## Result Notes
+# - as expected its best to have positve points for intended object (BG) and the cells as negatives
 # # TODO
 # - use different methods to smoothen the masks
 # - https://docs.monai.io/en/stable/transforms.html#fillholes for holes
