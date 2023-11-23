@@ -1,15 +1,8 @@
 # %% [markdown]
-# # Plot the example annotation(s)
-#
-#
-# ## Notes on the format
-#
-# see `annotation-outline.txt` and `out.json`
-#
-# - some annotations have multiple results
-# - all masks 4 color channels are identical (re-evaluate on final data)
-#
-
+# # Plot the annotated data
+# ## Notes
+# - the points are incomplete and inconsistently placed
+# - there are only half of the boxes annotated
 # %%
 import sys, os; sys.path += ['..']  # NOTE find shared modules
 
@@ -19,51 +12,34 @@ import skimage
 import json
 import pandas as pd
 
-# %%
-image = plt.imread("data/third/1.jpg")
-
-_annot = json.load(open('data/third/annotations.json'))
-
-# %%
 from util.label_studio_converter__brush import *
+from util.plot import *
+from util.preprocess import *
 
-def preprocess_point(annot):
-  '''
-    returns: dict: image → numpy instance segmentation mask
-  '''
+# %%
+image = skimage.io.imread("data/third/1.jpg")
 
-  out = pd.DataFrame()
-
-  for result in annot[0]['annotations'][0]['result']:
-    h,w = result['original_height'], result['original_width']
-    # rot = result['image_rotation]
-
-    x = result['value']['x']/100 * w
-    y = result['value']['y']/100 * h
-    s = result['value']['width']
-
-    i = result['to_name']
-
-    out = pd.concat([out, pd.DataFrame(dict(
-      x=[x],
-      y=[y],
-    ))], ignore_index=True)
-
-  return out
-points = preprocess_point(_annot).to_numpy()
+points = preprocess_point("data/third/annotations.json")
 
 # %%
 
 def plot_points(image, points):
   fig, ax = plt.subplots(ncols=1, nrows=1, figsize=(13,10))
-  plt.tight_layout()
-  ax.axis('off')
-
-  ax.imshow(image)
-  ax.scatter(points[:,0], points[:,1], s=10, c='red', marker='o')
+  imshow(image, ax)
+  ax.scatter(points[:,1], points[:,0], s=10, c='red', marker='o')
 
 plot_points(image, points)
+points.shape
 
 # %%
 
+boxes = preprocess_bbox("data/third/boxes.json")
 
+fig, ax = mk_fig(shape=image.shape, scale=5)
+
+plot_image(image, ax)
+plot_boxes(boxes, ax)
+
+boxes.shape
+
+# %%

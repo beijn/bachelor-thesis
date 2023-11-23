@@ -1,6 +1,0 @@
-
-
-
-- fix µSAM tiling for ginormous objects
-  - probably non trivial because you have to match masks in the overlap depending on likely sameness
-  - my bg/bg thing can work more trivially because theres only one object
