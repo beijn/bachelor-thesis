@@ -3,7 +3,7 @@ channels:
 - conda-forge
 
 dependencies:
-- python
+- python==3.11
 
 - ipykernel
 - nbconvert
@@ -18,3 +18,4 @@ dependencies:
 - scikit-image
 - scipy
 - opencv
+- colour-science
