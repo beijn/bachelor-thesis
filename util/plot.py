@@ -13,7 +13,7 @@ __SCALE__ = 18
 
 
 
-def mk_fig(x=1, y=1, shape=(1,1), scale=__SCALE__, **subplot_args):
+def mk_fig(x=1, y=1, shape=(1,1), scale=__SCALE__, flat=True, **subplot_args):
   shape = np.array(shape)[:2]
   shape = shape / shape.min()
 
@@ -24,7 +24,10 @@ def mk_fig(x=1, y=1, shape=(1,1), scale=__SCALE__, **subplot_args):
 
   if x == 1: axs = [axs]
   if y == 1: axs = [[ax] for ax in axs]
-  return fig, np.array(axs)
+
+  axs = np.array(axs)
+  if flat: axs = axs.ravel()
+  return fig, axs
 
 
 def imshow(im, ax=None, fig=None, kw_subplot={}, kw_imshow={}, scale=__SCALE__, title=""):
