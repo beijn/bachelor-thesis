@@ -1,0 +1,10 @@
+
+- currently training on HPC exceeds time limit and API is also too opaque :(
+
+
+## Plan
+
+- use masks with bg recalib loss to train a segmenter
+
+- select only masks which contain 1 annotation point / match boxes (scrap merged masks)
+

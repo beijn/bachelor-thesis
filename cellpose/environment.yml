@@ -2,11 +2,16 @@ name: cellpose
 channels:
 - conda-forge
 dependencies:
-- python=3.8
-- cellpose[gui]
+- cellpose
 
 - matplotlib  # for plots
 - ipykernel  # for notebooks
 - jupytext
+- nbconvert
 
 - scikit-image
+- colorcet
+- pandas
+- pip:
+  - onnxruntime-gpu 
+  - onnxruntime
