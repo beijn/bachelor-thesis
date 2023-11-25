@@ -10,36 +10,36 @@ import numpy as np
 import matplotlib.pyplot as plt
 from cellpose import models
 from cellpose.io import imread
+import pandas as pd
+
+from util.plot import *
+
+import skimage
+
+# %% 
+
+dataset = 'third'
+data = pd.read_csv(f'../data/{dataset}/data.csv', sep='\s+').query('objective == "40x"')
 
 
-dataset_id = 'third'
-imgids = [1,2,3,4]
-model_type = 'cyto'
+imgids = data['imgid'].unique()
 
 
+data
 # %%
 
-cache_dir = os.path.join(os.path.expanduser('~'), '.cache', 'thesis', 'cellpose', dataset_id)
-os.makedirs(os.path.join(cache_dir, 'masks'), exist_ok=True)
-
-
+model_type = 'cyto'
 model = models.Cellpose(model_type=model_type, gpu=True, net_avg=True)
 images = [imread(f'../data/third/{i}.jpg') for i in imgids]
 
-masks, _flows, _styles, diams = model.eval(images, diameter=None, channels=[[0,0]])  # automatic diameter detection works often well
-
-for imgid, mask in zip(imgids, masks):
-  pMasks = f"{cache_dir}/masks/{imgid}-{model_type}.npy"
-  np.save(pMasks, mask)
-
+masks, _flows, _styles, diams = model.eval(images, diameter=None, channels=[[1,0]]) # we select the green channel because it seemed to be the sharpest
 
 # %%
-import skimage
 
-fig, axes = plt.subplots(2, 2, figsize=(13, 10))
-plt.tight_layout()
+fig, axs = mk_fig(3,2, shape=images[0].shape[:2])
 
-for img, ax, mask, d, i in zip(images, axes.flat, masks, diams, range(1,99)):
-  ax.axis('off');
-  ax.imshow(skimage.color.label2rgb(mask, img, bg_color=None, alpha=0.5, saturation=1))
-  ax.set_title(f'cellpose (vanilla): second/{i}.jpg (auto cell diameter: {d:.0f}px)')
+for img, ax, mask, d, i in zip(images, axs.flat, masks, diams, imgids):
+  plot_image(skimage.color.label2rgb(mask, img, bg_color=None, alpha=0.5, saturation=1, colors=colors), ax=ax)
+  ax.set_title(f'cellpose (vanilla): {dataset}/{i}.jpg (auto cell diameter: {d:.0f}px)')
+
+# %%
