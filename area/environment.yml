@@ -1,0 +1,17 @@
+name: area
+channels:
+- conda-forge
+dependencies:
+
+- matplotlib  # for plots
+- ipykernel  # for notebooks
+- jupytext
+- nbconvert
+
+- scikit-image
+- colorcet
+- pandas
+- onnxruntime
+- pip:
+  - onnxruntime-gpu 
+  
