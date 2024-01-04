@@ -1,0 +1,1 @@
+ssh uthpc -t 'screen -dr || screen -s zsh'

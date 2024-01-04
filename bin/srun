@@ -2,7 +2,7 @@
 
 
 if [ $# = 1 ]; then
-  srun -p gpu --gres gpu:tesla:1 --cpus-per-task=10 --mem=40G --time 360 -J "$1" --pty zsh
+  srun -p gpu --gres gpu:tesla:1 --cpus-per-task=10 --mem=40G --time 360 -J "$1" --pty zsh -A revvity
   exit $?
 else 
   echo " >> Please provide exactly one argument = a job identifier. << "

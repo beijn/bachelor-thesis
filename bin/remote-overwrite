@@ -9,7 +9,7 @@ if [ "$1" = "push" ]; then
     DEST="$REMOTE"
 elif [ "$1" = "pull" ]; then
     echo "  >> pull overwriting from remote. PLEASE CONFIRM <<  "
-    SRC="$REMOTE"
+    SRC="$REMOTE"~
     DEST="$LOCAL"
 else
     echo "  >> please specify push to or pull from remote (note that this script overwrites!) <<  "

@@ -7,6 +7,7 @@
 #SBATCH --partition=gpu
 #SBATCH --gres=gpu:tesla:1
 #SBATCH --mail-user=benjamin.eckhardt@ut.ee
+#SBATCH -A revvity
 #SBATCH -o runs/%j.out # STDOUT
 
 
@@ -25,6 +26,8 @@ mkdir -p "$OUTDIR"
 
 
 echo; echo; echo "  ===  RUNNING  $FILE  ===  "; echo
+
+nvidia-smi
 
 
 micromamba shell init --shell=bash --prefix=~/.micromamba   >/dev/null
