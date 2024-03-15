@@ -3,15 +3,19 @@ channels:
 - conda-forge
 dependencies:
 
-- matplotlib  # for plots
-- ipykernel  # for notebooks
 - jupytext
+- ipykernel  
 - nbconvert
 
-- scikit-image
-- colorcet
-- pandas
 - onnxruntime
 - pip:
   - onnxruntime-gpu 
+
+- matplotlib 
+- scikit-image
+- colorcet
+- pandas
   
+- holoviews
+- jupyter_bokeh
+- bokeh

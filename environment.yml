@@ -1,3 +1,5 @@
+# base environment for all envornments because of the shared structure
+
 name: thesis
 
 channels:
@@ -5,53 +7,31 @@ channels:
 
 dependencies:
 - python
+
   
-- ipykernel  # for notebooks
-- nbconvert
+# running py as ipynb
 - jupytext
+- ipykernel 
+- nbconvert
 
-- matplotlib  # for plots
-- scikit-image
-- colorcet
 
-# cellpose
-- cellpose[gui]
-
-# label-studio
+# util.preprocess (label-studio)
+- numpy
+- pandas
 - pip
 - pip:
   - label-studio
   - label-studio-sdk
 
-# micro-sam
-- micro_sam  # lib
-- napari  # annotate
-- pyqt  # annotate
-- torch_em  # train
 
-# seunet
-- albumentations
-- einops
-- fvcore
-- iopath
-- ipython
-- matplotlib
-- numpy
-- pandas
-- pycocotools
-- pytorch
+# util.plot
+- matplotlib  
 - scikit-image
-- scikit-learn
-- scipy
-- tifffile
-- timm
-- torchvision
-- tqdm
-- typing_extensions
-- pip
-- pip:
-  - opencv-python
-  - opencv-python-headless
+- colorcet
 
-# stardist
-- stardist
+
+# util.onnx
+- onnxruntime
+- pip:
+  - onnxruntime-gpu 
+

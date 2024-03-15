@@ -10,20 +10,19 @@ _config_dict = dict(
         CENTERNET=dict(
             DECONV_CHANNEL=[512, 256, 128, 64],
             DECONV_KERNEL=[4, 4, 4],
-            NUM_CLASSES=80,
+            NUM_CLASSES=1,
             MODULATE_DEFORM=True,
-            BIAS_VALUE=-2.19,
+            BIAS_VALUE=-2.19,  # apparently this has to do with classes
             DOWN_SCALE=4,
-            MIN_OVERLAP=0.7,
-            TENSOR_DIM=128,
+            MIN_OVERLAP=0.7, # deleted in favor of constant rardius, I think its not needed
+            TENSOR_DIM=512,   # max cap of number of instance - NOTE in 1 20x image there can be 2000 cells - lower this when we lower the image size
         ),
         LOSS=dict(
-            CLS_WEIGHT=1,
-            WH_WEIGHT=0.1,
-            REG_WEIGHT=1,
+            WEIGHT_SCOREMAP=1,
+            WEIGHT_OFFSET=0.0001,  # TODO for debugging some training
         ),
     ),
-    INPUT=dict(
+    INPUT=dict( # TODO this all is unnneded
         AUG=dict(
             TRAIN_PIPELINES=[
                 ('CenterAffine', dict(
@@ -62,12 +61,26 @@ _config_dict = dict(
             WARMUP_ITERS=1000,
         ),
         IMS_PER_BATCH=128,
+        MAX_ITER=126000,  # TODO redundant with LR_SCHEDULER.MAX_ITER
     ),
     OUTPUT_DIR=osp.join(
         '/data/Outputs/model_logs/playground',
         osp.split(osp.realpath(__file__))[0].split("playground/")[-1]  # NOTE: this file was moved therefore this is bullshit currenlty
     ),
-    GLOBAL=dict(DUMP_TEST=False)
+    GLOBAL=dict(DUMP_TEST=False),
+    TEST=dict(
+        EXPECTED_RESULTS=[],
+        EVAL_PERIOD=0,
+        KEYPOINT_OKS_SIGMAS=[],
+        DETECTIONS_PER_IMAGE=100,  # TODO more...
+        AUG=dict(  # TODO understand what is this
+            ENABLED=False,
+            MIN_SIZES=(400, 500, 600, 700, 800, 900, 1000, 1100, 1200),
+            MAX_SIZE=4000,
+            FLIP=True,
+        ),
+        PRECISE_BN=dict(ENABLED=False, NUM_ITER=200),  # TODO: what?
+    ),
 )
 
 

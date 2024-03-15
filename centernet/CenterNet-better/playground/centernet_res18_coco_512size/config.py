@@ -13,9 +13,9 @@ _config_dict = dict(
             NUM_CLASSES=80,
             MODULATE_DEFORM=True,
             BIAS_VALUE=-2.19,
-            DOWN_SCALE=4,
+            DOWN_SCALE=4,  # = input size / feature map size, fmap size = scoremap size, regression target map size, 
             MIN_OVERLAP=0.7,
-            TENSOR_DIM=128,
+            TENSOR_DIM=128,  # this is 
         ),
         LOSS=dict(
             CLS_WEIGHT=1,
@@ -52,19 +52,19 @@ _config_dict = dict(
     SOLVER=dict(
         OPTIMIZER=dict(
             NAME="SGD",
-            BASE_LR=0.02,
+            BASE_LR=0.002,
             WEIGHT_DECAY=1e-4,
         ),
         LR_SCHEDULER=dict(
             GAMMA=0.1,
-            STEPS=(81000, 108000),
-            MAX_ITER=126000,
-            WARMUP_ITERS=1000,
+            STEPS=(810, 1080),  # scrapped 00 from all
+            MAX_ITER=1260,
+            WARMUP_ITERS=10,
         ),
-        IMS_PER_BATCH=128,
+        IMS_PER_BATCH=16,
     ),
     OUTPUT_DIR=osp.join(
-        '/data/Outputs/model_logs/playground',
+        './output',   # NOTE changed this
         osp.split(osp.realpath(__file__))[0].split("playground/")[-1]
     ),
     GLOBAL=dict(DUMP_TEST=False)

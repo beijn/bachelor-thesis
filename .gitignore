@@ -2,3 +2,4 @@ __pycache__
 .ipynb_checkpoints
 
 1-lft.npy
+**/*.mp4

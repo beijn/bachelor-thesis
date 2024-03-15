@@ -1,0 +1,35 @@
+name: smp
+channels:
+- pytorch
+- nvidia
+- conda-forge
+
+dependencies:
+
+- ipykernel
+- nbconvert
+- jupytext
+
+- numpy
+- pandas
+- matplotlib
+- ipympl  # for interactive plots using `%matplotlib ipympl`
+- colorcet
+- scikit-image
+- scipy
+
+- pytorch
+- pytorch-cuda=12.1
+- torchvision 
+- torchaudio
+
+- segmentation-models-pytorch
+
+- holoviews
+
+- onnxruntime
+- cudnn
+- pip:
+  - onnxruntime-gpu 
+
+- ffmpeg  # NOTE! reinstall this from conda-forge if you get an error about libh264.so (newer versions)

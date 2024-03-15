@@ -11,6 +11,8 @@ from .generator import CenterNetDecoder, CenterNetGT
 from .loss import modified_focal_loss, reg_l1_loss
 
 
+import pickle
+
 class CenterNet(nn.Module):
     """
     Implement CenterNet (https://arxiv.org/abs/1904.07850).
@@ -71,7 +73,12 @@ class CenterNet(nn.Module):
         up_fmap = self.upsample(features)
         pred_dict = self.head(up_fmap)
 
-        gt_dict = self.get_ground_truth(batched_inputs)
+        gt_dict, radii, classes = self.get_ground_truth(batched_inputs)
+
+        pickle.dump(gt_dict | dict(images = images, features = features, up_fmap = up_fmap, pred_dict = pred_dict, radii = radii, classes=classes), open('gt_dict.pkl', 'wb'))
+        import os; os.system('echo $PWD')
+        raise Exception('stop')
+
 
         return self.losses(pred_dict, gt_dict)
 
@@ -187,3 +194,4 @@ class CenterNet(nn.Module):
         images = [self.normalizer(img / 255) for img in images]
         images = ImageList.from_tensors(images, self.backbone.size_divisibility)
         return images
+

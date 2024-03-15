@@ -1,0 +1,59 @@
+
+
+discuss cellnet with dima
+- cellnet
+  - apply blob detection to output
+  - or threshholding
+  - also check out deconvolution
+  - improve target heatmap: close gaussians should repell each other
+  - improve loss: maybe cross entropy? try focal as in centernet   (aim: while the exact position is relaively wain each cell (-centerpoint) should get exactly one blob)
+    - subpress faulty detections, like dirt?
+    - enhance repelling of neighbouring gaussian
+    - maybe try other than gaussian
+    - evaluation metric could be avarage distance between target and prediction objects in optimal matching
+      - also account for difference in number of detected objects
+
+
+- compound task: border information - like in original unet paper
+
+
+
+- THesis: redraw timeline 
+ -> problems solutions patterns to be seen from this 
+
+
+- say stuart that Im focusing on thesis writing
+- ask for more points 
+- compare with their counts to estimate healthy error boundaries  (model vs human vs current approach)
+  - maybe model is near to human but far from their current approach
+
+
+- counts counts counts  
+
+
+
+
+
+
+
+
+- replace Sten's model with Kaupo's formula
+
+
+
+--- ideas 
+
+- incomplete annotatios: bg recalib loss from denys's thesis
+
+
+- pretraining data: cycleGAN to translate between livecell and sanger datasets
+
+
+--- notes 
+
+- cell clusters have higher density, therefore area based method instable and better to segment individual cells (area as baseline)
+
+
+
+
+

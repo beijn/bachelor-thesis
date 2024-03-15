@@ -85,7 +85,8 @@ class TrainerBase:
     Attributes:
         iter(int): the current iteration.
 
-        start_iter(int): The iteration to start with.
+        start_iter(int): The iteration to start
+          with.
             By convention the minimum possible value is 0.
 
         max_iter(int): The iteration to end training.
@@ -206,6 +207,9 @@ class SimpleTrainer(TrainerBase):
         """
         data = next(self._data_loader_iter)
         data_time = time.perf_counter() - start
+
+        #import pickle; pickle.dump(data, open('data.pkl', 'wb'))
+        #raise Exception('stop')
 
         """
         If your want to do something with the losses, you can wrap the model.

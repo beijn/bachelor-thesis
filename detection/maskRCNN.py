@@ -112,7 +112,7 @@ def get_model_instance_segmentation(num_classes):
         in_features_mask,
         hidden_layer,
         num_classes
-    )
+    )   
 
     return model
 

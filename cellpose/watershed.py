@@ -12,16 +12,11 @@ sys.path += [".."]  # NOTE find shared modules
 from util.preprocess import *
 from util.plot import *
 
-import colorcet
-import itertools as it
-from scipy.ndimage import generic_filter
-
 from cellpose import models
 from cellpose.io import imread
 
 
-def norm(x):
-    return (x - x.min()) / (x.max() - x.min())
+def norm(x): return (x - x.min()) / (x.max() - x.min())
 
 
 # %%
@@ -31,10 +26,10 @@ img = imread(f"../data/{img_path}")
 img = img.astype(np.float32) / 255
 
 # green channel turned out to be the sharpest
-G = img[:, :, 1]
+G = norm(img[:, :, 1])
 
-pos = preprocess_point("../data/third/annotations.json")
-neg = preprocess_point("../data/third/annot-bg.json")
+pos = preprocess_point("../data/third/points.json")
+neg = preprocess_point("../data/third/background.json")
 
 
 plot_image(G, title=f"Input image (green channel): {img_path}")
@@ -55,26 +50,26 @@ import numpy as np
 
 
 def get_sess(model_path: str):
-    providers = [
-        (
-            "CUDAExecutionProvider",
-            {
-                "device_id": 0,
-                "gpu_mem_limit": int(
-                    8000 * 1024 * 1024
-                ),  # parameter demands value in bytes
-                "arena_extend_strategy": "kSameAsRequested",
-                "cudnn_conv_algo_search": "HEURISTIC",
-                "do_copy_in_default_stream": True,
-            },
-        ),
-        "CPUExecutionProvider",
-    ]
-    sess_opts: ort.SessionOptions = ort.SessionOptions()
-    sess_opts.log_severity_level = 2
-    sess_opts.log_verbosity_level = 2
-    sess = ort.InferenceSession(model_path, providers=providers, sess_options=sess_opts)
-    return sess
+  providers = [
+  (
+    "CUDAExecutionProvider",
+    {
+    "device_id": 0,
+    "gpu_mem_limit": int(
+      8000 * 1024 * 1024
+    ),  # parameter demands value in bytes
+    "arena_extend_strategy": "kSameAsRequested",
+    "cudnn_conv_algo_search": "HEURISTIC",
+    "do_copy_in_default_stream": True,
+    },
+  ),
+  "CPUExecutionProvider",
+  ]
+  sess_opts: ort.SessionOptions = ort.SessionOptions()
+  sess_opts.log_severity_level = 2
+  sess_opts.log_verbosity_level = 2
+  sess = ort.InferenceSession(model_path, providers=providers, sess_options=sess_opts)
+  return sess
 
 
 model_path = "../data/phaseimaging-combo-v3.onnx"
@@ -91,11 +86,11 @@ thresh = 0.01
 mask = (pred[0, 0] > thresh).reshape(img.shape[:2])
 
 plot_image(
-    pred[0, 0], title=f"Predicted fake phase reconstruction from B and G channel"
+  pred[0, 0], title=f"Predicted fake phase reconstruction from B and G channel"
 )
 plot_image(
-    skimage.color.label2rgb(1 - mask, img, bg_color=None, alpha=0.3),
-    title=f"Mask (fake phase reconstruction, threshold {thresh:.2f})",
+  skimage.color.label2rgb(1 - mask, img, bg_color=None, alpha=0.3),
+  title=f"Mask (fake phase reconstruction, threshold {thresh:.2f})",
 )
 
 # # %%
@@ -149,47 +144,46 @@ model = models.Cellpose(model_type="cyto", gpu=True, net_avg=True)
 images = [img]
 
 masks, _flows, _styles, diams = model.eval(
-    images, diameter=None, channels=[[2, 0]]
+  images, diameter=None, channels=[[2, 0]]
 )  # automatic diameter detection works often well
 
 plot_image(
-    skimage.color.label2rgb(
-        masks[0], img, bg_color=None, alpha=0.4, colors=colors, saturation=1
-    ),
-    title=f"cellpose (vanilla): {img_path}, diameter {diams[0]:.0f}px",
+  skimage.color.label2rgb(
+  masks[0], img, bg_color=None, alpha=0.4, colors=colors, saturation=1
+  ),
+  title=f"cellpose (vanilla): {img_path}, diameter {diams[0]:.0f}px",
 )
 # %%
 
 model_train = models.CellposeModel(
-    gpu=True, diam_mean=diams[0], net_avg=True, model_type="cyto"
+  gpu=True, diam_mean=diams[0], net_avg=True, model_type="cyto"
 )
 
 
 plot_image(
-    skimage.color.label2rgb(
-        masks[0], img, bg_color=None, alpha=0.4, colors=colors, saturation=1
-    ),
-    title=f"cellpose (vanilla): {img_path}, diameter {diams[0]:.0f}px",
+  skimage.color.label2rgb(
+  masks[0], img, bg_color=None, alpha=0.4, colors=colors, saturation=1
+  ),
+  title=f"cellpose (vanilla): {img_path}, diameter {diams[0]:.0f}px",
 )
 
-# %% 
 model_train.train(
-    train_data=images,
-    train_labels=[ws],
-    channels=[2, 0],
-    n_epochs=10,
-    #save_path="cyto-1-100",
-    learning_rate=0.1,
-    weight_decay=0.0001,
+  train_data=images,
+  train_labels=[ws],
+  channels=[2, 0],
+  n_epochs=1,
+  #save_path="cyto-1-100",
+  learning_rate=0.0001,
+  weight_decay=0.0001,
 )
 
 masks, _flows, _styles = model_train.eval(images, diameter=diams[0], channels=[[2, 0]])
 
 plot_image(
-    skimage.color.label2rgb(
-        masks[0], img, bg_color=None, alpha=0.4, colors=colors, saturation=1
-    ),
-    title=f"cellpose (trained on watershed): {img_path}",
+  skimage.color.label2rgb(
+  masks[0], img, bg_color=None, alpha=0.4, colors=colors, saturation=1
+  ),
+  title=f"cellpose (trained on watershed): {img_path}",
 )
 
 

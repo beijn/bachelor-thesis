@@ -2,7 +2,7 @@ import numpy as np
 import json
 
 
-def preprocess_point(annot_file = '../data/third/annotations.json', dims='yx'):
+def preprocess_point(annot_file, dtype=np.float32, unique=True, device=False):
   annot = json.load(open(annot_file))
   out = np.zeros((len(annot[0]['annotations'][0]['result']), 2))
 
@@ -15,15 +15,17 @@ def preprocess_point(annot_file = '../data/third/annotations.json', dims='yx'):
     # rot = result['image_rotation]
     #s = result['value']['width']
     #n = result['to_name']
+    
+    out[i,0], out[i,1] = x,y  # NOTE: THIS WAS SWAPPED AND OLDER CODE MAY FAIL NOW
+  
+  if not device:
+    out.astype(dtype)
 
-    out[i,0] = y    # NOTE x y order
-    out[i,1] = x
-    # NOTE: its swapped but now my code depends on it... need to refactor this later
+  if device:
+    import torch
+    out = torch.from_numpy(out).to(device).to(dtype)
 
-    if dims=='xy':
-      out[i,:] = [x,y]
-
-  return out.astype(np.int16)
+  return out
 
 
 def preprocess_bbox(file):

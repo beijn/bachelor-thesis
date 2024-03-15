@@ -1,0 +1,39 @@
+# base environment for all envornments because of the shared structure
+
+name: torch
+
+channels:
+- conda-forge
+
+dependencies:
+- python
+
+  
+# running py as ipynb
+- jupytext
+- ipykernel 
+- nbconvert
+
+
+# util.preprocess (label-studio)
+- numpy
+- pandas
+- pip
+- pip:
+  - label-studio
+  - label-studio-sdk
+
+
+# util.plot
+- matplotlib  
+- scikit-image
+- colorcet
+
+
+# util.onnx
+- onnxruntime
+- pip:
+  - onnxruntime-gpu 
+
+
+- pytorch

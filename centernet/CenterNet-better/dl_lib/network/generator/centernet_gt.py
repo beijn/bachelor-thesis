@@ -44,7 +44,7 @@ class CenterNetGT(object):
             box_tensor = boxes.tensor
             wh[..., 0] = box_tensor[..., 2] - box_tensor[..., 0]
             wh[..., 1] = box_tensor[..., 3] - box_tensor[..., 1]
-            CenterNetGT.generate_score_map(
+            radii = CenterNetGT.generate_score_map(
                 gt_scoremap, classes, wh,
                 centers_int, min_overlap,
             )
@@ -63,7 +63,7 @@ class CenterNetGT(object):
             "reg_mask": torch.stack(reg_mask_list, dim=0),
             "index": torch.stack(index_list, dim=0),
         }
-        return gt_dict
+        return gt_dict, radii, classes
 
     @staticmethod
     def generate_score_map(fmap, gt_class, gt_wh, centers_int, min_overlap):
@@ -73,6 +73,7 @@ class CenterNetGT(object):
         for i in range(gt_class.shape[0]):
             channel_index = gt_class[i]
             CenterNetGT.draw_gaussian(fmap[channel_index], centers_int[i], radius[i])
+        return radius
 
     @staticmethod
     def get_gaussian_radius(box_size, min_overlap):
