@@ -30,6 +30,7 @@ img = img.astype(np.float32) / 255
 G = img[:, :, 1]
 
 pos = preprocess_point("../data/third/points.json")
+pos = np.stack([pos[:, 1], pos[:, 0]], axis=1)
 
 
 plot_image(G, title=f"Input image (green channel): {img_path}");
@@ -170,6 +171,12 @@ ax.set_title(f"Cell Density Distribution in Regular Tiles");
 acc = 1-np.mean([abs(counts[i] - dens*areas[i]) / counts[i] for i in dense_tiles])
 
 print(f"Avarage accuracy in {len(tiles)} dense tiles: {acc:.2f} ± {np.std([abs(counts[i] - dens*areas[i]) / counts[i] for i in dense_tiles]):.2f} (mean relative error)")
+
+
+# standard deviation of the density in dense tiles
+print(f"Standard deviation of the density in dense tiles: {np.std([denss[i] for i in dense_tiles]):.2f}")
+# and relative to mean 
+print(f"Standard deviation of the density in dense tiles relative to mean: {np.std([denss[i] for i in dense_tiles]) / dens:.2f}")
 # %%
 
 # now aggregate areas, counts and denss for every third tile

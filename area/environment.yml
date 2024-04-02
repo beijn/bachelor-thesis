@@ -1,5 +1,6 @@
 name: area
 channels:
+- pytorch
 - conda-forge
 dependencies:
 
@@ -7,6 +8,7 @@ dependencies:
 - ipykernel  
 - nbconvert
 
+- pytorch
 - onnxruntime
 - pip:
   - onnxruntime-gpu 

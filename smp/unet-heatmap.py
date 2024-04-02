@@ -1,5 +1,5 @@
 # %% [markdown]
-# # Train UNet on   Point Heatmapsheatmaps
+# # Train UNet on Point Heatmaps
 # %%
 
 import skimage, scipy
@@ -35,35 +35,55 @@ if SLICE: RGB = RGB[:SLICE, :SLICE]
 # green channel turned out to be the sharpest
 G = RGB[..., 1]
 
-
 RGB2 = norm(skimage.io.imread(f"../data/{dataset}/2.jpg").astype(np.float32))
 if SLICE: RGB2 = RGB2[:SLICE, :SLICE]
 G2 = RGB2[..., 1]
 
-pos = preprocess_point("../data/third/points-plus.json")
-if SLICE: pos = np.array([[x,y] for x,y in pos if 0 <= x < SLICE and 0 <= y < SLICE])
+RGB4 = norm(skimage.io.imread(f"../data/{dataset}/4.jpg").astype(np.float32))
+if SLICE: RGB4 = RGB4[:SLICE, :SLICE]
+G4 = RGB4[..., 1]
+
+pos = preprocess_point("../data/third/points.json")
+# round the points to integers
+
 
 # remove double points in pos
 pos = np.unique(pos, axis=0)
+outside_points = len(pos) 
 
-ax = plot_image(G, title=f"Input image (green channel): {dataset}/{imgid}")
-plot_points(pos, ax, c='r')
+# remove points outside of the image
+pos = np.array([[x,y] for x,y in pos if 0 <= y < G.shape[0] and 0 <= x < G.shape[1]])
+outside_points -= len(pos)
 
+#ax = plot_image(G, title=f"Input image (green channel): {dataset}/{imgid}", scale=2.5)
+# ax.scatter(pos[:,0], pos[:,1], c='r', s=8**2, marker='o', label="Target points")
+
+print(f"Removed {outside_points} points from outside of the image")
 # %%
 
 target = np.zeros_like(G)
 # draw small gaussians at every point
 for x,y in pos.astype(int):
-  target[x,y] = 1
-target = norm(skimage.filters.gaussian(target, sigma=3.5, mode='constant'))
+  target[y,x] = 1  # pay attention to this weird swap
+target = skimage.filters.gaussian(target, sigma=3.5, mode='constant')#*0.95   # 0.85 because its to hard for sigmoid to produce 1  
+
+norm_factor = target.sum()
+target = norm(target)
+norm_factor = norm_factor / target.sum()
+print(f"Normalization factor: {norm_factor}")
+
+# reran with REDUCED NORM() and hope model learns to predict well
+# NOTE: if applying normalization, the prediction should be corrected by the same factor to derive cell counts
+# NOTE: maybe later I should change something about the sigmoid? (look at Xie et al. 2016)
 
 
 #target = G; print("Setting target as G channel")   # NOTE change this back TODO
 
-plot_image(target, title=f"Target Heatmap");
+plot_image(target, title=f"Target Heatmap", scale=2.5)
 target = torch.from_numpy(target).unsqueeze(0).unsqueeze(0).float().to(device)
 input = torch.from_numpy(np.transpose(RGB, (2, 0, 1))).unsqueeze(0).float().to(device)
 input2 = torch.from_numpy(np.transpose(RGB2, (2, 0, 1))).unsqueeze(0).float().to(device)
+input4 = torch.from_numpy(np.transpose(RGB4, (2, 0, 1))).unsqueeze(0).float().to(device)
 
 # %%
 
@@ -94,8 +114,8 @@ for ax in axs:
 
 # %% 
 model = smp.Unet(
-  encoder_name="resnet34",
-  encoder_weights=None,
+  encoder_name="resnet34",   
+  encoder_weights=None,  
   in_channels=3,
   classes=1,
   activation='sigmoid',
@@ -112,11 +132,10 @@ LOG = []
 n_epochs = 501 if CUDA else 51
 batch_size = 32 if CUDA else 8
 
-optimizer = torch.optim.Adam(model.parameters(), lr=2e-3)
+optimizer = torch.optim.Adam(model.parameters(), lr=2e-3)   # THIS STEP: tried to increase the learning rate because the unnormalized GT is 1e2 smaller in sum
 criterion = torch.nn.MSELoss()
-#scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=8, verbose=True)
-scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=80, gamma=0.5)
-
+#scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=10, verbose=True)
+scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=60, gamma=0.5)
 model.train()
 
 for epoch in range(n_epochs):
@@ -130,26 +149,29 @@ for epoch in range(n_epochs):
 
   loss.backward()
   optimizer.step()
-
+ 
   if epoch % 1 == 0:
     with torch.no_grad():
       model.eval()
-      pred = model(input)
-      pred2 = model(input2)
+   #   pred = model(input)
+   #   pred2 = model(input2)
 
       LOG.append(dict(
         epoch = epoch,
         loss = loss.item(),
         lr = optimizer.param_groups[0]['lr'],
-        pred = pred[0].detach().cpu().numpy(),
-        pred2 = pred2[0].detach().cpu().numpy(),
+  #      pred = pred[0].detach().cpu().numpy(),
+  #      pred2 = pred2[0].detach().cpu().numpy(),
       ))
-
   
   scheduler.step()#(loss.item())
 
-losses = np.array([x['loss'] for x in LOG])
-plt.plot(losses)
+losses = np.array([x['loss'] for x in LOG]); 
+#print(list(losses[:5])); losses[:5] = 0  # first few will be very high, we can see the training convergence better if they are left out
+losses /= losses.max()
+lrs = np.array([x['lr'] for x in LOG]); lrs /= lrs.max()
+plt.plot(losses, label='loss')
+plt.plot(lrs, label='lr')
 
 # %%
 
@@ -157,8 +179,11 @@ model.eval()
 with torch.no_grad():
   pred = model(input).detach().cpu().numpy()[0][0]
   pred2 = model(input2).detach().cpu().numpy()[0][0]
+  pred4 = model(input4).detach().cpu().numpy()[0][0]
 
-fig, axs = mk_fig(1,5, scale=1, shape=target.shape[-2:])
+axs = []
+for i in range(5):
+  axs.append(mk_fig(1,1, scale=2, shape=target.shape[-2:])[1])
 
 targ = target[0,0].detach().cpu().numpy()
 inp = input[0,1].detach().cpu().numpy()
@@ -166,13 +191,24 @@ inp2 = input2[0,1].detach().cpu().numpy()
 
 plot_points = lambda ax: ax.scatter(pos[:,1], pos[:,0], c='magenta', s=8**2, marker='+', label="Target points")
 
-plot_image(targ, ax=axs[0], title=f"Target Heatmap")
+title = F"Target Heatmap Overlayed on Training Image"
+heat = norm(np.stack([targ, Z:=np.zeros_like(targ),Z,targ], axis=-1))
+plot_image(inp, ax=axs[0], title=title)
+plot_image(heat, ax=axs[0], title=title)
+
+
 plot_image(pred, ax=axs[1], title=f"Predicted Heatmap")
+axs[1].scatter(pos[:,0], pos[:,1], facecolors='none', edgecolors='blue', marker='o', label="point annotations", alpha=0.5, linewidths=1)
+# add a legend to top right
+axs[1].legend(loc='upper right')
 
 title = f"Difference between Target and Predicted Heatmap"
-plot_image(pred-targ, ax=axs[2], title=title, cmap='coolwarm')
+plot_image(norm(pred)-norm(targ), ax=axs[2], title=title, cmap='coolwarm')
+# plot annotated points
+axs[2].scatter(pos[:,0], pos[:,1], facecolors='none', edgecolors='black', marker='o', label="point annotations", alpha=0.5, linewidths=1)
+# add a legend to top right
+axs[2].legend(loc='upper right')
 
-title = F"Predicted Heatmap Overlayed on Train Image"
 heat = norm(np.stack([pred, Z:=np.zeros_like(pred),Z,pred], axis=-1))
 plot_image(inp, ax=axs[3], title=title)
 plot_image(heat, ax=axs[3], title=title)
@@ -182,81 +218,12 @@ heat = norm(np.stack([pred2, Z:=np.zeros_like(pred2),Z,pred2], axis=-1))
 plot_image(inp2, ax=axs[4], title=title)
 plot_image(heat, ax=axs[4], title=title)
 
-#[plot_points(ax) for ax in axs[1:4]];
 
-# %%
-targ = target[0,0].detach().cpu().numpy().T
-inp = input[0,1].detach().cpu().numpy().T
-inp2 = input2[0,1].detach().cpu().numpy().T
-
-try: 
-  import numpy as np
-  from matplotlib.animation import FuncAnimation, FFMpegWriter
-  from IPython import display
-  import matplotlib.pyplot as plt
-  import os 
-  try: 
-    os.system("module load ffmpeg")
-  except: 
-    print("could not: module load ffmpeg")
-    pass
-
-  scale = 4 if CUDA else 1
-  fig, (ax, ax2) = mk_fig(2,1, scale=scale, shape=target.shape[-2:]) 
-
-  FRAMES = len(LOG)
-
-  logify = False
-
-  H = target.shape[-2]
-
-  losses, lrs = [ (
-    y := np.array([x[dim] for x in LOG]),
-    y := np.log(y) if logify else y,
-    m := y.min() if logify else 0,
-    H - (y - m) / (y.max() - m) * H
-    )[-1]
-    
-    for dim in ['loss', 'lr']
-  ]
- 
-  def animate(i):
-    epoch, loss, lr, pred, pred2 = [LOG[i][k] for k in 'epoch loss lr pred pred2'.split()]
-    pred = pred[0].T  # only one channel in this case
-    pred2 = pred2[0].T
-
-    H,W = pred.shape
-
-    ax.clear()
-    xs = np.linspace(0, W*(i-1)/FRAMES, i)
-    ax.plot(xs, losses[:i], label=f"{'log' if logify else ''} loss")
-    ax.plot(xs, lrs[:i], label=f"{'log' if logify else ''} lr")
-
-    #plot_image(pred, ax=ax0, title=f"Predicted Heatmap")
-    title = F"Predicted Heatmap Overlayed on Train Image"
-    heat = norm(np.stack([pred, Z:=np.zeros_like(pred),Z,pred], axis=-1))
-    plot_image(inp, ax=ax, title=title)
-    plot_image(heat, ax=ax, title=title)
-    #ax.scatter(pos[:,1], pos[:,0], c='magenta', s=8*scale**2, marker='+', label="Target points")
-    ax.legend();
-  
-    ax2.clear()
-    title = F"Predicted Heatmap Overlayed on Verification Image"
-    heat = norm(np.stack([pred2, Z:=np.zeros_like(pred2),Z,pred2], axis=-1))
-    plot_image(inp2, ax=ax2, title=title)
-    plot_image(heat, ax=ax2, title=title)
+print(f"Sums: target: {targ.sum():.2f}, pred: {pred.sum():.2f}, pred2: {pred2.sum():.2f}, pred4: {pred4.sum():.2f}")
+print(f"Mins: target: {targ.min():.2f}, pred: {pred.min():.2f}, pred2: {pred2.min():.2f}, pred4: {pred4.min():.2f}")
+print(f"Maxs: target: {targ.max():.2f}, pred: {pred.max():.2f}, pred2: {pred2.max():.2f}, pred4: {pred4.max():.2f}")
+print(f"\nCounts: target: {target.sum()*norm_factor}, pred: {pred.sum()*norm_factor}, pred2: {pred2.sum()*norm_factor}, pred4: {pred4.sum()*norm_factor}")
 
 
-  anim = FuncAnimation(fig, animate, frames=FRAMES, interval=100)
- 
-  if CUDA:  
-    writervideo = FFMpegWriter(fps=30) 
-    anim.save('../runs/smp/unet-heatmap/training-convergence.mp4', writer=writervideo) 
-  else:
-    video = anim.to_html5_video()
-    html = display.HTML(video)
-    display.display(html)
-    plt.close()
 
-except: pass
 # %%

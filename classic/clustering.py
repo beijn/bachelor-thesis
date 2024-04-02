@@ -23,13 +23,13 @@ import itertools as it
 # %%
 
 
-def imshow(img, pos=None, neg=None, ax=None, scale=20):
+def imshow(img, pos=None, neg=None, ax=None, scale=10):
   if ax is None:
     fig, ax = plt.subplots(1,1, figsize=(4*scale, 3*scale))
 
   ax.imshow(img, cmap='gray')
-  if pos is not None: ax.scatter(pos[:,1], pos[:,0], s=scale*4, marker='x', c='cyan')
-  if neg is not None: ax.scatter(neg[:,1], neg[:,0], s=scale*4, marker='D', c='red' )
+  if pos is not None: ax.scatter(pos[:,0], pos[:,1], s=scale*4, marker='x', c='cyan')
+  if neg is not None: ax.scatter(neg[:,0], neg[:,1], s=scale*4, marker='D', c='red' )
   ax.axis('off')
   plt.tight_layout()
   return ax
@@ -38,24 +38,21 @@ def imshow(img, pos=None, neg=None, ax=None, scale=20):
 img_rgb = ski.io.imread('../data/third/1.jpg')
 
 img = ski.color.rgb2gray(img_rgb)
-pos = preprocess_point('../data/third/annotations.json')
-neg = preprocess_point('../data/third/annot-bg.json')
+pos = preprocess_point('../data/third/points.json').astype(int)
+pos = np.array([[x,y] for x,y in pos if 0 <= y < img.shape[0] and 0 <= x < img.shape[1]])
 
 colors = colorcet.m_glasbey.colors
 colors = [c for c,_ in zip(it.cycle(colors), pos)]
 
 imshow(img)
 
-# %% [markdown]
-# ## Clustering by k-means based on instensity and selecting the pixels from lowest cluster for nucleus detection
-# - seems like it would also benefit from something relative because in some conglomerates theres less contrast
 # %%
 
 # compute the distance tranform of an image where every pos point is marked
 import scipy.ndimage
 
 points = np.ones_like(img)
-points[pos[:,0], pos[:,1]] = 0
+points[pos[:,1], pos[:,0]] = 0
 
 dist = scipy.ndimage.distance_transform_edt(points)
 imshow(dist, pos)
@@ -66,10 +63,16 @@ data = np.stack([img, dist], axis=-1)
 from scipy.cluster.vq import whiten, kmeans, vq, kmeans2
 
 data = whiten(data.reshape(-1,2)).reshape(*data.shape)
-
 imshow(data[...,0], pos)
 
+# %% 
+centroids, labels = kmeans2(data.reshape(-1,2), 5, iter=50, minit='++')
+labels = labels.reshape(data.shape[:2])
 
+#%%
+imshow(labels, pos)
+
+imshow(ski.color.label2rgb(labels, img, colors=colors), pos)
 
 # %% 
 
@@ -91,12 +94,7 @@ imshow(ski.color.label2rgb(labels, img, colors=colors), pos)
 
 # %%
 
-centroids, labels = kmeans2(data.reshape(-1,2), 4, iter=50, minit='++')
-labels = labels.reshape(data.shape[:2])
 
-imshow(labels, pos)
-
-imshow(ski.color.label2rgb(labels, img, colors=colors), pos)
 
 # %%
 
