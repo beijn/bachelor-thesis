@@ -1,16 +1,18 @@
-# Bachelorthesis in Computer Science
+# Bachelor's Thesis in Computer Science
 ## Localizing Cells in Phase-Contrast Microscopy Images using Sparse and Noisy Center-Point Annotations
 Submitted by Benjamin Eckhardt on April 1, 2024. Reviewed by Dr. Dmytro Fishman and Dr. Constantin Pape.
 
-This is the code of my [Bachelor's Thesis](https://github.com/beijn/bachelor-thesis/blob/main/Thesis.pdf) conducted with the Biomedical Computer Vision Lab at _University of Tartu_ and the Computational Cell Analytics group at _University of Göttingen_ for a human genome study at _Wellcome Sanger Institute_ in Cambridge.
+This is the code of my [Bachelor's Thesis](<./Bachelor's Thesis.pdf>) conducted with the Biomedical Computer Vision Lab at _University of Tartu_ and the Computational Cell Analytics group at _University of Göttingen_ for a human genome study at _Wellcome Sanger Institute_ in Cambridge.
 The goal of this work is to localize and count the living cells in low-quality phase-contrast images using only sparse and noisy center-point annotations.
 
-Notebooks with results of the experiments together with their code are under [runs](https://github.com/beijn/bachelor-thesis/blob/main/runs). 
+Notebooks with results of the experiments together with their code are under [./runs](./runs). 
+
+The data is in the [./data](./data) folder.
 
 
 ## Introduction
 
-![Visual representation of the work performed in this thesis. The phase-contrast microscopy image were acquired by our research partners at Sanger (left panel). We implemented, applied and evaluated several deep learning approaches for detecting cells present on those images (middle panel), such as zero-Shot instance segmentation (middle top), object detection (middle center), and density map regression (middle  bottom). Those approaches were trained using sparse and at times noisy point annotations (right panel).](https://github.com/beijn/bachelor-thesis/blob/main/graphical-abstract.png)
+![Visual representation of the work performed in this thesis. The phase-contrast microscopy image were acquired by our research partners at Sanger (left panel). We implemented, applied and evaluated several deep learning approaches for detecting cells present on those images (middle panel), such as zero-Shot instance segmentation (middle top), object detection (middle center), and density map regression (middle  bottom). Those approaches were trained using sparse and at times noisy point annotations (right panel).](./graphical-abstract.png)
 
 Computer vision and in particular object detection using deep learning has been the key for automated high-throughput data analysis in many applications. This thesis applies object detection in, at a first glance, very unusual area - genome research. Specifically, our collaborators at the Wellcome Sanger Institute in Cambridge aim to map vital genes in humans. To this end, they continuously introduce targeted mutations in the genome of a human cell culture and count the surviving cells' proportion. The great number of counts that has to be performed demands for an automated high-throughput workflow with low recurring costs. Our collaborators previously relied on using the Countess 3 FL cell counting device by ThermoFisher in an expensive and time-consuming semi-manual process with unacceptable inaccuracies.
 By developing multiple approaches to count cells using only microscopy images, we minimize material and time expenses and contribute to a completely automated and resource efficient high-throughput workflow for the mapping of vital genes.
